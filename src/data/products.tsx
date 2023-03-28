@@ -1,17 +1,19 @@
 
-import {TProduct} from '../units/Product'
+import {TProduct} from '../units/Products'
 
-export const products: TProduct[] = [
+export const initProducts: TProduct[] = [
   {
     "id": 1,
     "title": "Milk", 
+    "price": 123,
     "description": "Good milk",
-    "price": 123
+    "producer": "Vanish"
   },
   {
     "id": 2,
     "title": "Eggs", 
+    "price": 234,
     "description": "Good eggs",
-    "price": 234
+    "producer": "Tide"
   }
-]
+];

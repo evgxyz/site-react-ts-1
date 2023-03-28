@@ -5,11 +5,14 @@ import {TBasketControl, BasketActionTypes} from './Basket'
 export interface TProduct {
   id: number | string,
   title: string,
-  description?: string,
   price: number,
+  description?: string,
+  producer?: string,
 }
 
+// карточка продукта 
 export interface TProductCardProps {
+  product: TProduct,
   basketControl: TBasketControl
 }
 
@@ -25,9 +28,16 @@ export function ProductCard(props: TProductCardProps) {
 
   return (
     <div>
-      <div>{props.basketControl.state.count}</div>
+      <div>
+        <pre>{JSON.stringify(props.product)}</pre>
+      </div>
       <button onClick={handlerIncrement}>Добавить</button>
       <button onClick={handlerDecrement}>Убавить</button>
     </div>
   );
+}
+
+export interface TProducer {
+  id: number | string,
+  title: string,
 }

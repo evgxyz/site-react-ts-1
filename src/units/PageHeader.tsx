@@ -7,8 +7,8 @@ export interface TPageHeaderProps {
 
 export function PageHeader(props: TPageHeaderProps) {
   return (
-    <header>
-      <div className='header'>
+    <header className='header'>
+      <div className='header__content'>
         <div>Logo</div>
         <div>{props.basketTray}</div>
       </div>

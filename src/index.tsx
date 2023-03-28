@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {App} from './App'
+import {App} from './App';
+import './index.css';
 
 window.addEventListener(
   'hashchange', 
@@ -8,9 +9,9 @@ window.addEventListener(
     const newUrlHash = (new URL(ev.newURL)).hash;
     const oldUrlHash = (new URL(ev.oldURL)).hash;
 
-    const regex = /^\#?$|^\#\!/;
+    const regex = /^#?$|^#!/;
     if (regex.test(newUrlHash) || regex.test(oldUrlHash)) {
-      window.location.reload() 
+      window.location.reload();
     }
   }
 );
@@ -19,4 +20,4 @@ const urlHash = window.location.hash ?? '';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-root.render(<App urlHash={urlHash}/>);
+root.render(<App urlHash={urlHash} />);

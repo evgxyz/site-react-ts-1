@@ -21,17 +21,17 @@ export function App(props: TAppProps) {
     </>
   )
 
-  if (props.urlHash == '#!catalog') {
-    pageContent = <Catalog basketControl={basketControl}/>
+  if (props.urlHash === '#!catalog') {
+    pageContent = <Catalog basketControl={basketControl} />
   } 
   else 
-  if (props.urlHash == '#!admin') {
+  if (props.urlHash === '#!admin') {
     pageContent = <h1>Админка</h1>
   }
 
   return (
     <div className='page-wrapper'>
-    <PageHeader basketTray={<BasketTray basketControl={basketControl}/>}/>
+    <PageHeader basketTray={<BasketTray basketControl={basketControl} />} />
     <main>{pageContent}</main>
     <footer>footer</footer>
     </div>
