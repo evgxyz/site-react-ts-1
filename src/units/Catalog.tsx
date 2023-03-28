@@ -100,10 +100,12 @@ function ProductFilter(props: TProductFilterProps) {
   return (
     <form className='filter__form' onSubmit={filterParamsSubmit}>
       <div className='filter__price'>
+        <div>Цена</div>
         <input type='text' value={priceFr} onChange={priceFrOnChange} />
         <input type='text' value={priceTo} onChange={priceToOnChange} />
       </div>
       <div ref={filterProducers} className='filter__producers'>
+        <div>Производитель</div>
         <FilterProducers />
       </div>
       <button type='submit'>Показать</button>
@@ -112,7 +114,7 @@ function ProductFilter(props: TProductFilterProps) {
 }
 
 /**************************/
-// подфильтр производитель
+// подфильтр по производителю
 function FilterProducers() {
   
   const [producers, setProducers] = useState(initProducers);
@@ -136,17 +138,17 @@ function FilterProducers() {
         <input type='text' value={producerQuery} onChange={producerQueryOnChange} />
         <button onClick={producerQuerySubmit}>Найти</button>
       </form>
-      <ul>
-        {producers.map(producer => {
-          return (
-            <li key={producer.id}>
-              <label>
-                <input type='checkbox' name='producer' data-title={producer.title} />
-                  {producer.title}
-                </label>
-            </li>
-          );
-        })}
+      <ul className='filter__producers-list'>
+        { producers.map(producer => {
+            return (
+              <li key={producer.id}>
+                <label>
+                  <input type='checkbox' name='producer' data-title={producer.title} />
+                    {producer.title}
+                  </label>
+              </li>
+            );
+          })}
       </ul>
     </>
   );
