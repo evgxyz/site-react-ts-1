@@ -68,8 +68,8 @@ function ProductFilter(props: TProductFilterProps) {
   // цена от и до
   const [priceFr, setPriceFr] = useState('0');
   const [priceTo, setPriceTo] = useState('1000');
-  // список производителей
-  const filterProducers = useRef<HTMLDivElement>(null);
+  // ссылка на фильтр производителей
+  const filterProducersRef = useRef<HTMLDivElement>(null);
 
   function filterParamsSubmit(ev: React.SyntheticEvent) {
     ev.preventDefault();
@@ -78,7 +78,7 @@ function ProductFilter(props: TProductFilterProps) {
     const newPriceTo = parseInt(priceTo);
     
     const newProducers = 
-      Array.from(filterProducers.current?.querySelectorAll('input[name="producer"]:checked') ?? [])
+      Array.from(filterProducersRef.current?.querySelectorAll('input[name="producer"]:checked') ?? [])
       .map(el => el.getAttribute('data-title') ?? '')
       .filter(s => (s !== ''));
 
@@ -104,7 +104,7 @@ function ProductFilter(props: TProductFilterProps) {
         <input type='text' value={priceFr} onChange={priceFrOnChange} />
         <input type='text' value={priceTo} onChange={priceToOnChange} />
       </div>
-      <div ref={filterProducers} className='filter__producers'>
+      <div ref={filterProducersRef} className='filter__producers'>
         <div>Производитель</div>
         <FilterProducers />
       </div>
@@ -148,7 +148,8 @@ function FilterProducers() {
                   </label>
               </li>
             );
-          })}
+          })
+        }
       </ul>
     </>
   );
