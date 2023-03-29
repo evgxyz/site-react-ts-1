@@ -1,5 +1,5 @@
 
-import React, {useReducer} from 'react';
+import React, {useState, useEffect, useReducer} from 'react';
 
 export interface TBasketState {
   count: number
@@ -44,8 +44,13 @@ interface TBasketTrayProps {
 }
 
 export function BasketTray(props: TBasketTrayProps) {
+
+  const [value, setValue] = useState(false);
+
+  useEffect(() => { setValue(prevValue => !prevValue) }, [props.basketControl.state.count] )
+
   return (
-    <div>
+    <div style={{color: value ? 'red' : 'green'}}>
       В корзине {props.basketControl.state.count} товаров
     </div>
   );

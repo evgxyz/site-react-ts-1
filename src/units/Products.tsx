@@ -6,8 +6,19 @@ export interface TProduct {
   id: number | string,
   title: string,
   price: number,
-  description?: string,
-  producer?: string,
+  description: string,
+  producer: string,
+  categories: string[],
+}
+
+export interface TProducer {
+  id: number | string,
+  title: string,
+}
+
+export interface TCategory {
+  id: number | string,
+  title: string,
 }
 
 // карточка продукта 
@@ -35,9 +46,4 @@ export function ProductCard(props: TProductCardProps) {
       <button onClick={handlerDecrement}>Убавить</button>
     </div>
   );
-}
-
-export interface TProducer {
-  id: number | string,
-  title: string,
 }
