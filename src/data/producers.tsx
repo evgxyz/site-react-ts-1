@@ -9,5 +9,9 @@ export const initProducers: TProducer[] = [
   {
     "id": 2,
     "title": "Tide"
+  },
+  {
+    "id": 3,
+    "title": "AOS"
   }
 ];

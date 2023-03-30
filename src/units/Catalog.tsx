@@ -1,6 +1,6 @@
 
-import React, {useState, useEffect, useRef, useReducer} from 'react';
-import {isIntStr, mergeObjects} from './utils';
+import React, {useState, useEffect} from 'react';
+import {isIntStr, mergeObj, addObj} from './utils';
 import {TBasketControl} from './Basket';
 import {TProduct, TProducer, TCategory, ProductCard} from './Products';
 import {initProducts} from '../data/products';
@@ -10,8 +10,8 @@ import {initCategories} from '../data/categories';
 interface TFilterParams {
   priceFr: number,
   priceTo: number,
-  producers: string[],
-  categories: string[],
+  producers: (TProducer & {checked: boolean})[],
+  categories: (TCategory & {checked: boolean})[],
 }
 
 const defaultPriceFr = 0;
@@ -39,28 +39,28 @@ export function Catalog(props: TCatalogProps) {
     setProductList(newProductList);
   }
 
-  const [filterParams, setFilterParams] = useState(defaultFilterParams as TFilterParams);
-  // const filterParamsControl = useReducer((filterParams, action) => {
-  //   switch (action.type) {
-  //     case 
-  //     default:
-  //       return filterParams;
-  //   }
-  // }, 
-  // defaultFilterParams as TFilterParams);
+  const [filterParams, setFilterParams] = useState(defaultFilterParams);
   
-  const [categoriesAll, setCategoriesAll] = useState([] as TCategory[]);
+  async function initFilterParams() {
+    // производитель
+    const producersAll = await fetchProducers();
+    const newProducers = producersAll.map(pr => mergeObj(pr, {checked: false}));
 
-  async function updateCategoriesAll() {
-    const newCategoriesAll = await fetchCategories();
-    setCategoriesAll(newCategoriesAll);
+    // производитель
+    const categoriesAll = await fetchCategories();
+    const newCategories = categoriesAll.map(ct => mergeObj(ct, {checked: false}));
+
+    setFilterParams(fp => mergeObj(fp, {
+      producers: newProducers,
+      categories: newCategories,
+    }));
   }
 
-  useEffect(() => {updateCategoriesAll()}, []);
+  useEffect(() => {initFilterParams()}, []);
 
   return (
     <div className='catalog'>
-      <pre>{JSON.stringify(filterParams)}</pre>
+      <pre>{'filterParams:\n' + JSON.stringify(filterParams, null, 2)}</pre>
       {/* <div className='catalog__categories'>
         <ProductCategories 
           filterParamsControl={[filterParams, setFilterParams]}
@@ -68,10 +68,9 @@ export function Catalog(props: TCatalogProps) {
         />
       </div> */}
       <div className='catalog__filter'>
-        <ProductFilter 
+        <Filter 
           updateProductList={updateProductList}
           filterParamsControl={[filterParams, setFilterParams]} 
-          categoriesAll={categoriesAll}
         />
       </div>
       <div className='catalog__product-list'>
@@ -91,13 +90,51 @@ export function Catalog(props: TCatalogProps) {
 
 /**************************/
 // фильтр основной
-interface TProductFilterProps {
+interface TFilterProps {
   updateProductList: () => void,
-  filterParamsControl: [TFilterParams, React.Dispatch<React.SetStateAction<TFilterParams>>],
-  categoriesAll: TCategory[],
+  filterParamsControl: [
+    TFilterParams, 
+    React.Dispatch<React.SetStateAction<TFilterParams>>
+  ],
 }
 
-function ProductFilter(props: TProductFilterProps) {
+function Filter(props: TFilterProps) {
+
+  // отправить форму
+  function filterFormSubmit(ev: React.SyntheticEvent) {
+    ev.preventDefault();
+    props.updateProductList();
+  }
+
+  return (
+    <form className='filter__form' onSubmit={filterFormSubmit}>
+      <fieldset className='filter__price'>
+        <legend>Цена</legend>
+        <FilterPrice filterParamsControl={props.filterParamsControl} />
+      </fieldset>
+      <fieldset className='filter__producers'>
+        <legend>Производитель</legend>
+        <FilterProducers filterParamsControl={props.filterParamsControl} />
+      </fieldset>
+      <fieldset className='filter__categories'>
+        <legend>Категории</legend>
+        <FilterCategories filterParamsControl={props.filterParamsControl} />
+      </fieldset>
+      <button type='submit'>Показать</button>
+    </form>
+  );
+}
+
+/**************************/
+// подфильтр по цене
+interface TFilterPriceProps {
+  filterParamsControl: [
+    TFilterParams, 
+    React.Dispatch<React.SetStateAction<TFilterParams>>
+  ]
+}
+
+function FilterPrice(props: TFilterPriceProps) {
 
   const [filterParams, setFilterParams] = props.filterParamsControl;
 
@@ -111,7 +148,7 @@ function ProductFilter(props: TProductFilterProps) {
       if (!isFinite(price)) { 
         price = defaultPriceFr;
       }
-      setFilterParams(fp => mergeObjects(fp, {priceFr: price}));
+      setFilterParams(fp => mergeObj(fp, {priceFr: price}));
     }
   }
 
@@ -125,152 +162,137 @@ function ProductFilter(props: TProductFilterProps) {
       if (!isFinite(price)) { 
         price = defaultPriceTo;
       }
-      setFilterParams(fp => mergeObjects(fp, {priceTo: price}));
+      setFilterParams(fp => mergeObj(fp, {priceTo: price}));
     }
   }
 
-  // отправить форму
-  function filterFormSubmit(ev: React.SyntheticEvent) {
-    ev.preventDefault();
-    props.updateProductList();
+  return (
+    <>
+      <input type='text' value={priceFr} onChange={priceFrOnChange} />
+      <input type='text' value={priceTo} onChange={priceToOnChange} />
+    </>
+  )
+}
+
+/**************************/
+// подфильтр по производителю
+interface TFilterProducersProps {
+  filterParamsControl: [
+    TFilterParams, 
+    React.Dispatch<React.SetStateAction<TFilterParams>>
+  ]
+}
+
+function FilterProducers(props: TFilterProducersProps) {
+
+  const [filterParams, setFilterParams] = props.filterParamsControl;
+  
+  const [queryProducers, setQueryProducers] = useState('');
+  const [producerIds, setProducerIds] = useState([] as number[]);
+
+  // получение списка производителей 
+  async function updateProducerIds() {
+    const producers = await fetchProducers(queryProducers);
+    const newProducerIds = producers.map(pr => pr.id);
+    setProducerIds(newProducerIds);
+  }
+
+  // при первом рендере
+  useEffect(() => {updateProducerIds()}, [queryProducers]);
+
+  // обработчик поля поиска
+  function queryProducersOnChange(ev: React.FormEvent<HTMLInputElement>) {
+    setQueryProducers(ev.currentTarget.value);
+  }
+
+  // обработчик чекбокса
+  function producerOnChange(producerId: number) {
+    setFilterParams(fp => { 
+      const newProducers = fp.producers.map(
+        pr => (pr.id == producerId) ? addObj(pr, {checked: !pr.checked}) : pr
+      );
+      return mergeObj(fp, {producers: newProducers})
+    });
   }
 
   return (
-    <form className='filter__form' onSubmit={filterFormSubmit}>
-      <pre>{JSON.stringify(filterParams)}</pre>
-      <fieldset className='filter__price'>
-        <legend>Цена</legend>
-        <input type='text' value={priceFr} onChange={priceFrOnChange} />
-        <input type='text' value={priceTo} onChange={priceToOnChange} />
-      </fieldset>
-      {/* <fieldset ref={filterProducersRef} className='filter__producers'>
-        <legend>Производитель</legend>
-        <FilterProducers />
-      </fieldset>
-      <fieldset ref={filterCategoriesRef} className='filter__categories'>
-        <legend>Категории</legend>
-        <FilterCategories 
-          filterParamsControl={[filterParams, setFilterParams]}
-          categoriesAll={props.categoriesAll} 
-        />
-      </fieldset> */}
-      <button type='submit'>Показать</button>
-    </form>
+    <>
+      <pre>{JSON.stringify(producerIds)}</pre>
+      <pre>{JSON.stringify(queryProducers)}</pre>
+      <div>
+        <input type='text' value={queryProducers} onChange={queryProducersOnChange} />
+      </div>
+      <ul className='filter__producers-list'>
+        { 
+          filterParams.producers
+            .filter(producer => (producer.checked || producerIds.includes(producer.id)))
+            .map(producer => {
+              return (
+                <li key={producer.id}>
+                  <label>
+                    <input type='checkbox' 
+                      data-producer-id={producer.id} 
+                      checked={producer.checked} 
+                      onChange={() => {producerOnChange(producer.id)}}
+                    />
+                    {producer.title}
+                  </label>
+                </li>
+              );
+            }
+          )
+        }
+      </ul>
+    </>
   );
 }
 
-// /**************************/
-// // подфильтр по производителю
-// function FilterProducers() {
+/**************************/
+// подфильтр по категориям
+interface TFilterCategoriesProps {
+  filterParamsControl: [
+    TFilterParams, 
+    React.Dispatch<React.SetStateAction<TFilterParams>>
+  ]
+}
+
+function FilterCategories(props: TFilterCategoriesProps) {
   
-//   const [producers, setProducers] = useState([] as TProducer[]);
-//   const [producerQuery, setProducerQuery] = useState('');
-
-//   // получение списка производителей 
-//   async function updateProducers() {
-//     const newProducers = await fetchProducers(producerQuery);
-//     setProducers(newProducers);
-//   }
-
-//   // при первом рендере
-//   useEffect(() => {updateProducers()}, []);
-
-//   // поиск производителей
-//   function producerQuerySubmit(ev: React.SyntheticEvent) {
-//     ev.preventDefault();
-//     updateProducers();
-//   }
-
-//   // обработчик поля ввода
-//   function producerQueryOnChange(ev: React.FormEvent<HTMLInputElement>) {
-//     setProducerQuery(ev.currentTarget.value);
-//   }
-
-//   return (
-//     <>
-//       <div>
-//         <input type='text' value={producerQuery} onChange={producerQueryOnChange} />
-//         <button onClick={producerQuerySubmit}>Найти</button>
-//       </div>
-//       <ul className='filter__producers-list'>
-//         { 
-//           producers.map(producer => {
-//             return (
-//               <li key={producer.id}>
-//                 <label>
-//                   <input type='checkbox' name='producer' data-title={producer.title} />
-//                     {producer.title}
-//                   </label>
-//               </li>
-//             );
-//           })
-//         }
-//       </ul>
-//     </>
-//   );
-// }
-
-// /**************************/
-// // подфильтр по категориям
-// interface TFilterCategoriesProps {
-//   filterParamsControl: [TFilterParams, (v: TFilterParams) => void],
-//   categoriesAll: TCategory[],
-// }
-
-// function FilterCategories(props: TFilterCategoriesProps) {
+  const [filterParams, setFilterParams] = props.filterParamsControl;
   
-//   const [filterParams, ] = props.filterParamsControl;
+  // обработчик чекбокса
+  function categoryOnChange(categoryId: number) {
+    setFilterParams(fp => { 
+      const newCategories = fp.categories.map(
+        ct => (ct.id == categoryId) ? addObj(ct, {checked: !ct.checked}) : ct
+      );
+      return mergeObj(fp, {categories: newCategories})
+    });
+  }
 
-//   const [categories, setCategories] = useState([] as (TCategory & {checked: boolean})[]);
-
-//   useEffect(() => {
-//     setCategories(
-//       props.categoriesAll.map(cat => ({
-//         id: cat.id, 
-//         title: cat.title, 
-//         checked: false
-//       }))
-//     )
-//   }, [props.categoriesAll]);
-
-//   function categoryOnChange(title: string) {
-//     setCategories(
-//       cats => cats.map(cat => ((cat.title == title) ? {...cat, checked: !cat.checked} : cat))
-//     );
-//   }
-
-//   useEffect(() => {
-//     setCategories(cats => 
-//       cats.map(
-//         cat => ((filterParams.categories.includes(cat.title)) ? {...cat, checked: !cat.checked} : cat)
-//       )
-//     );
-//   }, [filterParams]);
-
-//   return (
-//     <>
-//     {JSON.stringify(categories)}
-//     <ul className='filter__categories-list'>
-//       { 
-//         categories.map(category => {
-//           return (
-//             <li key={category.id}>
-//               <label>
-//                 <input type='checkbox' name='category' 
-//                   data-title={category.title} 
-//                   checked={category.checked}
-//                   onChange={() => {categoryOnChange(category.title)}}
-//                 />
-//                 {category.title}
-//               </label>
-//             </li>
-//           );
-//         })
-//       }
-//     </ul>
-//     </>
-//   );
-// }
+  return (
+    <ul className='filter__categories-list'>
+      { 
+        filterParams.categories
+          .map(category => {
+            return (
+              <li key={category.id}>
+                <label>
+                  <input type='checkbox' 
+                    data-category-id={category.id} 
+                    checked={category.checked} 
+                    onChange={() => {categoryOnChange(category.id)}}
+                  />
+                  {category.title}
+                </label>
+              </li>
+            );
+          }
+        )
+      }
+    </ul>
+  );
+}
 
 // /**************************/
 // // подфильтр по категориям
@@ -308,6 +330,15 @@ function ProductFilter(props: TProductFilterProps) {
 
 // получение списка продкутов с "сервера"
 async function fetchProducts(filterParams: TFilterParams) {
+
+  const producerTitles = filterParams.categories
+    .filter(pr => pr.checked)
+    .map(pr => pr.title);
+
+  const categoryTitles = filterParams.categories
+    .filter(ct => ct.checked)
+    .map(ct => ct.title);
+
   const products: TProduct[] = JSON.parse(String(localStorage.getItem('products'))) ?? [];
   const filteredProducts = products.filter(product => {
       return (
@@ -315,13 +346,12 @@ async function fetchProducts(filterParams: TFilterParams) {
         ( (!isFinite(filterParams.priceFr) || product.price >= filterParams.priceFr) && 
           (!isFinite(filterParams.priceTo) || product.price <= filterParams.priceTo) ) &&
         // производитель
-        ( filterParams.producers.length == 0 || 
-          filterParams.producers.includes(product.producer) ) &&
+        ( producerTitles.length == 0 || producerTitles.includes(product.producer) ) &&
         // категории
-        ( filterParams.categories.length == 0 || 
-          (() => {
+        ( categoryTitles.length == 0 || 
+          (() => {  
             for (let category of product.categories) {
-              if (filterParams.categories.includes(category)) return true;
+              if (categoryTitles.includes(category)) return true;
             }
             return false;
           })() )
@@ -331,12 +361,13 @@ async function fetchProducts(filterParams: TFilterParams) {
 }
 
 // получение списка производителей с "сервера"
-async function fetchProducers(producerQuery: string) {
-  const producers: TProducer[] = JSON.parse(String(localStorage.getItem('producers'))) ?? [];
-  const filteredProducers = producers.filter(producer =>
-    producer.title.toLowerCase().includes(producerQuery.toLowerCase())
+async function fetchProducers(query: string = '') {
+  query = query.trim();
+  const producersAll: TProducer[] = JSON.parse(String(localStorage.getItem('producers'))) ?? [];
+  const producers = producersAll.filter(producer =>
+    producer.title.toLowerCase().includes(query.toLowerCase())
   );
-  return filteredProducers;
+  return producers;
 }
 
 // получение списка категорий с "сервера"
