@@ -19,6 +19,10 @@ export interface TBasketControl {
   dispatch: TBasketDispatch
 }
 
+const BasketInitState: TBasketState = {
+  count: 0
+}
+
 function basketReducer(state: TBasketState, action: TBasketAction) {
   switch (action.type) {
     case BasketActionTypes.inc: 
@@ -28,10 +32,6 @@ function basketReducer(state: TBasketState, action: TBasketAction) {
     default: 
       return state;
   }
-}
-
-const BasketInitState: TBasketState = {
-  count: 0
 }
 
 export function useBasketControl(): TBasketControl {

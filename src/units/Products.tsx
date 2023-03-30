@@ -3,7 +3,7 @@ import React from 'react';
 import {TBasketControl, BasketActionTypes} from './Basket'
 
 export interface TProduct {
-  id: number | string,
+  id: number,
   title: string,
   price: number,
   description: string,
@@ -12,12 +12,12 @@ export interface TProduct {
 }
 
 export interface TProducer {
-  id: number | string,
+  id: number,
   title: string,
 }
 
 export interface TCategory {
-  id: number | string,
+  id: number,
   title: string,
 }
 
