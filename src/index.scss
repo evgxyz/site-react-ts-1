@@ -12,6 +12,27 @@ code {
     monospace;
 }
 
+// временная граница для отладки
+@mixin debug-border($color) { 
+  border: 1px solid $color;  
+}
+
+.toggle-link {
+  &:hover {
+    cursor: pointer;
+    color: red;
+    text-decoration: underline;
+  }
+
+  &--expander {
+    &:after {content: ' ▼';}
+    &.--expanded:after {content: ' ▲';}
+  }
+
+}
+
+input:focus::placeholder { opacity: 0; }
+
 .header {
   &__content {
     border: 1px solid red; 
@@ -22,4 +43,36 @@ code {
 .catalog {
   border: 1px solid red; 
   padding: 20px;
+}
+
+.filter__producers-list {
+  margin: 0 auto;
+  padding-left: 0;
+
+  &.--expanded {
+    max-height: 100px;
+    overflow: auto; 
+  }
+
+  & > li {
+    list-style-type: none;
+  }
+
+  @include debug-border(blue); 
+}
+
+.filter__categories-list {
+  margin: 0 auto;
+  padding-left: 0;
+
+  & > li {
+    list-style-type: none;
+  }
+
+  &.--expanded {
+    max-height: 100px;
+    overflow: auto; 
+  }
+
+  @include debug-border(blue); 
 }

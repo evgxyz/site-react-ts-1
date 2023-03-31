@@ -13,5 +13,13 @@ export const initProducers: TProducer[] = [
   {
     "id": 3,
     "title": "AOS"
+  },
+  {
+    "id": 4,
+    "title": "BiMax"
+  },
+  {
+    "id": 5,
+    "title": "Ariel"
   }
 ];

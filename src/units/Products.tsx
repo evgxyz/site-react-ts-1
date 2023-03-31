@@ -19,6 +19,7 @@ export interface TProducer {
 export interface TCategory {
   id: number,
   title: string,
+  rate: number,
 }
 
 // карточка продукта 

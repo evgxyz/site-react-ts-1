@@ -60,7 +60,7 @@ export function Catalog(props: TCatalogProps) {
 
   return (
     <div className='catalog'>
-      <pre>{'filterParams:\n' + JSON.stringify(filterParams, null, 2)}</pre>
+      <pre>{'filterParams:\n' + JSON.stringify(filterParams)}</pre>
       {/* <div className='catalog__categories'>
         <ProductCategories 
           filterParamsControl={[filterParams, setFilterParams]}
@@ -168,8 +168,9 @@ function FilterPrice(props: TFilterPriceProps) {
 
   return (
     <>
-      <input type='text' value={priceFr} onChange={priceFrOnChange} />
-      <input type='text' value={priceTo} onChange={priceToOnChange} />
+      <input type='text' value={priceFr} placeholder='От' onChange={priceFrOnChange} /> 
+      {' – '}
+      <input type='text' value={priceTo} placeholder='До' onChange={priceToOnChange} />
     </>
   )
 }
@@ -215,23 +216,36 @@ function FilterProducers(props: TFilterProducersProps) {
     });
   }
 
+  const [expanded, setExpanded] = useState(false);
+
+  function expandedToogleOnClick() {
+    setExpanded(expanded => !expanded);
+  }
+
+  let producersList = filterParams.producers
+    .filter(pr => (pr.checked || producerIds.includes(pr.id)));
+
+  producersList.sort(
+    (x, y) => (x.checked == y.checked ? 0 : x.checked < y.checked ? 1 : -1)
+  );
+  
+  if (!expanded) {
+    const maxLen = 3;
+    producersList = producersList.filter((x, i) => x.checked || i < maxLen);
+  }
+
   return (
     <>
-      <pre>{JSON.stringify(producerIds)}</pre>
-      <pre>{JSON.stringify(queryProducers)}</pre>
       <div>
-        <input type='text' value={queryProducers} onChange={queryProducersOnChange} />
+        <input type='text' value={queryProducers} placeholder='Найти' onChange={queryProducersOnChange} />
       </div>
       <ul className='filter__producers-list'>
         { 
-          filterParams.producers
-            .filter(producer => (producer.checked || producerIds.includes(producer.id)))
-            .map(producer => {
+          producersList.map(producer => {
               return (
                 <li key={producer.id}>
                   <label>
                     <input type='checkbox' 
-                      data-producer-id={producer.id} 
                       checked={producer.checked} 
                       onChange={() => {producerOnChange(producer.id)}}
                     />
@@ -243,6 +257,11 @@ function FilterProducers(props: TFilterProducersProps) {
           )
         }
       </ul>
+      <span 
+        className={['toggle-link toggle-link--expander', expanded ? '--expanded' : ''].join(' ')} 
+        onClick={expandedToogleOnClick}>
+        {expanded ? 'Свернуть' : 'Показать все'}
+      </span>
     </>
   );
 }
@@ -270,27 +289,48 @@ function FilterCategories(props: TFilterCategoriesProps) {
     });
   }
 
+  const [expanded, setExpanded] = useState(false);
+
+  function expandedToogleOnClick() {
+    setExpanded(expanded => !expanded);
+  }
+
+  let cateroriesList = filterParams.categories;
+  cateroriesList.sort(
+    (x, y) => (x.checked == y.checked ? 0 : x.checked < y.checked ? 1 : -1)
+  );
+  
+  if (!expanded) {
+    const maxLen = 3;
+    cateroriesList = cateroriesList.filter((x, i) => x.checked || i < maxLen);
+  }
+
   return (
-    <ul className='filter__categories-list'>
-      { 
-        filterParams.categories
-          .map(category => {
-            return (
-              <li key={category.id}>
-                <label>
-                  <input type='checkbox' 
-                    data-category-id={category.id} 
-                    checked={category.checked} 
-                    onChange={() => {categoryOnChange(category.id)}}
-                  />
-                  {category.title}
-                </label>
-              </li>
-            );
-          }
-        )
-      }
-    </ul>
+    <>
+      <ul className={['filter__categories-list', expanded ? '--expanded' : ''].join(' ')}>
+        { 
+          cateroriesList.map(category => {
+              return (
+                <li key={category.id}>
+                  <label>
+                    <input type='checkbox' 
+                      checked={category.checked} 
+                      onChange={() => {categoryOnChange(category.id)}}
+                    />
+                    {category.title}
+                  </label>
+                </li>
+              );
+            }
+          )
+        }
+      </ul>
+      <span 
+        className={['toggle-link toggle-link--expander', expanded ? '--expanded' : ''].join(' ')} 
+        onClick={expandedToogleOnClick}>
+        {expanded ? 'Свернуть' : 'Показать все'}
+      </span>
+    </>
   );
 }
 
@@ -364,15 +404,22 @@ async function fetchProducts(filterParams: TFilterParams) {
 async function fetchProducers(query: string = '') {
   query = query.trim();
   const producersAll: TProducer[] = JSON.parse(String(localStorage.getItem('producers'))) ?? [];
-  const producers = producersAll.filter(producer =>
-    producer.title.toLowerCase().includes(query.toLowerCase())
+  
+  const producers = producersAll.filter(x =>
+    x.title.toLowerCase().includes(query.toLowerCase())
+  )
+  .sort(
+    (x, y) => (x.title == y.title ? 0 : x.title > y.title ? 1 : -1)
   );
   return producers;
 }
 
 // получение списка категорий с "сервера"
 async function fetchCategories() {
-  const categories: TCategory[] = JSON.parse(String(localStorage.getItem('categories'))) ?? [];
+  const categoriesAll: TCategory[] = (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
+  const categories = categoriesAll.sort(
+    (x, y) => (x.title == y.title ? 0 : x.title > y.title ? 1 : -1)
+  );
   return categories;
 }
 
