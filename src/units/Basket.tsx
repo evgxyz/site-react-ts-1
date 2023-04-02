@@ -15,6 +15,7 @@ export enum BasketActionType {
   INIT,
   ADD, 
   SUB, 
+  DEL,
 }
 
 export interface TBasketAction {
@@ -89,6 +90,25 @@ function basketReducer(state: TBasket, action: TBasketAction) {
       return newState;
     }
 
+    case BasketActionType.DEL: {
+      let newState: TBasket;
+      const product = action.args as TProduct;
+      const index = state.products.findIndex(pr => pr.id === product.id);
+      if (index >= 0) {
+        state.products.splice(index, 1);
+        const totalPrice = state.products.reduce((s, pr) => (s + pr.price*pr.count), 0);
+        newState = { ...state, 
+          totalCount: state.products.length,
+          totalPrice: totalPrice
+        };
+      }
+      else {
+        newState = state
+      }
+      localStorage.setItem('basket', JSON.stringify(newState));
+      return newState;
+    }
+
     default: 
       return state;
   }
@@ -139,6 +159,71 @@ export function Basket(props: TBasketProps) {
     </div>
   );
 }
+
+// карточка продукта 
+/* interface TBasketProductCardProps {
+  product: TProduct,
+  basketControl: TBasketControl
+}
+
+function BasketProductCard(props: TBasketProductCardProps) {
+
+  const count = props.basketControl.state.products
+    .find(pr => pr.id === props.product.id)?.count ?? 0;
+
+  const handlerAdd = function() {
+    props.basketControl.dispatch({type: BasketActionType.ADD, args: props.product});
+  }
+
+  const handlerSub = function() {
+    props.basketControl.dispatch({type: BasketActionType.SUB, args: props.product});
+  }
+
+  const handlerDel = function() {
+    props.basketControl.dispatch({type: BasketActionType.DEL, args: props.product});
+  }
+
+  return (
+    <div className='product-card'>
+      <div className='product-card__content'>
+        <div className='product-card__title'>
+          {props.product.title}
+        </div>
+        <div className='product-card__description'>
+          {props.product.description}
+        </div>
+        <div className='product-card__price'>
+          Цена: {props.product.price} ₽
+        </div>
+        <div className='product-card__categories'>
+          {'Категории: '}
+          {
+            props.product.categories.map((ct, i) => (
+              <>
+              {i > 0 ? ', ' : ''}
+              <span key={ct} className='product-card__category'>{ct}</span>
+              </>
+            ))
+          }
+        </div>
+        <div className='product-card__producer'>
+          Производитель: {props.product.producer}
+        </div>
+        <div className='product-card__code'>
+          Штрихкод: {props.product.code}
+        </div>
+      </div>
+      <div className='product-card__menu'>
+        <div className='product-card__menu-info'>
+          {`В корзине ${count} шт на ${count*props.product.price} ₽`}
+        </div>
+        <button className='product-card__btn' onClick={handlerAdd}>+</button>{' '}
+        <button className='product-card__btn' onClick={handlerSub}>–</button>
+        <button className='product-card__btn' onClick={handlerDel}>X</button>
+      </div>
+    </div>
+  );
+} */
 
 // получение корзины из хранилища
 export async function fetchBasket() {

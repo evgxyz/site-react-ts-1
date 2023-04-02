@@ -42,6 +42,10 @@ export function ProductCard(props: TProductCardProps) {
     props.basketControl.dispatch({type: BasketActionType.SUB, args: props.product});
   }
 
+  const handlerDel = function() {
+    props.basketControl.dispatch({type: BasketActionType.DEL, args: props.product});
+  }
+
   return (
     <div className='product-card'>
       <div className='product-card__content'>
@@ -77,7 +81,8 @@ export function ProductCard(props: TProductCardProps) {
           {`В корзине ${count} шт на ${count*props.product.price} ₽`}
         </div>
         <button className='product-card__btn' onClick={handlerAdd}>+</button>{' '}
-        <button className='product-card__btn' onClick={handlerSub}>–</button>
+        <button className='product-card__btn' onClick={handlerSub}>–</button>{' '}
+        <button className='product-card__btn' onClick={handlerDel}>X</button>
       </div>
     </div>
   );
