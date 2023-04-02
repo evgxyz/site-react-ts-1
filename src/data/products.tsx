@@ -87,9 +87,9 @@ export const initProducts: TProduct[] = [
     "id": 10,
     "title": "Средство Ariel", 
     "price": 550,
-    "description": "Средство для живота",
+    "description": "Шампунь хороший",
     "producer": "Ariel",
     "code": "4604049097755",
-    "categories": ["Уход за животом"]
+    "categories": ["Шампунь"]
   },
 ];

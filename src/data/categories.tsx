@@ -14,7 +14,7 @@ export const initCategories: TCategory[] = [
   },
   {
     "id": 3,
-    "title": "Уход за животом",
+    "title": "Шампунь",
     "rate": 3
   },
   {
