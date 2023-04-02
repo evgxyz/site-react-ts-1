@@ -122,17 +122,20 @@ interface TBasketProps {
 
 export function Basket(props: TBasketProps) {
   return (
-    <div className='basket-products-list'>
-      {
-        props.basketControl.state.products.map(product => (
-          <ProductCard 
-            key={product.id} 
-            product={product} 
-            basketControl={props.basketControl} 
-          />
+    <div className='basket'>
+      <h1>Корзина</h1>
+      <div className='basket-products-list'>
+        {
+          props.basketControl.state.products.map(product => (
+            <ProductCard 
+              key={product.id} 
+              product={product} 
+              basketControl={props.basketControl} 
+            />
+          )
         )
-      )
-      }
+        }
+      </div>
     </div>
   );
 }

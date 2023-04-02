@@ -48,12 +48,7 @@ export function App() {
   else 
   if (urlHash === '#!basket') {
     document.title = 'Корзина';
-    pageContent = (
-      <>
-      <h1>Корзина</h1>
-      <Basket basketControl={basketControl} />
-      </>
-    ); 
+    pageContent = <Basket basketControl={basketControl} />
   } 
   else 
   if (urlHash === '#!admin') {

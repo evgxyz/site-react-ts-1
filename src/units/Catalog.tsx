@@ -70,7 +70,7 @@ export function Catalog(props: TCatalogProps) {
 
   return (
     <div className='catalog'>
-      {/* <pre>{'filterParams: ' + JSON.stringify(filterParams)}</pre> */}
+      <h1>Каталог</h1>
       <div className='catalog__hot-categories'>
         <HotCategories 
           filterParamsControl={[filterParams, setFilterParams]}
@@ -320,11 +320,12 @@ function FilterCategories(props: TFilterCategoriesProps) {
   }
 
   let cateroriesList = [...filterParams.categories];
-  cateroriesList.sort(
-    (x, y) => (x.checked == y.checked ? 0 : x.checked < y.checked ? 1 : -1)
-  );
   
   if (!expanded) {
+    cateroriesList.sort(
+      (x, y) => (x.checked == y.checked ? 0 : x.checked < y.checked ? 1 : -1)
+    );
+    
     const maxLen = 3;
     cateroriesList = cateroriesList.filter((x, i) => x.checked || i < maxLen);
   }
