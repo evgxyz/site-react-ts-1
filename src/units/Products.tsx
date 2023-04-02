@@ -82,7 +82,7 @@ export function ProductCard(props: TProductCardProps) {
         </div>
         <button className='product-card__btn' onClick={handlerAdd}>+</button>{' '}
         <button className='product-card__btn' onClick={handlerSub}>–</button>{' '}
-        <button className='product-card__btn' onClick={handlerDel}>X</button>
+        <button className='product-card__btn' onClick={handlerDel}>x</button>
       </div>
     </div>
   );
