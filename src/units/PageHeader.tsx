@@ -9,8 +9,10 @@ export function PageHeader(props: TPageHeaderProps) {
   return (
     <header className='header'>
       <div className='header__content'>
-        <div>Logo</div>
-        <div>{props.basketTray}</div>
+        <div className='heater__left'>Logo</div>
+        <div className='heater__right'>
+          {props.basketTray}
+        </div>
       </div>
     </header>
   );

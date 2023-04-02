@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {TBasketControl, BasketActionTypes} from './Basket'
+import {TBasketControl, BasketActionType} from './Basket';
 
 export interface TProduct {
   id: number,
@@ -8,6 +8,7 @@ export interface TProduct {
   price: number,
   description: string,
   producer: string,
+  code: string,
   categories: string[],
 }
 
@@ -30,21 +31,54 @@ export interface TProductCardProps {
 
 export function ProductCard(props: TProductCardProps) {
 
-  const handlerIncrement = function() {
-    props.basketControl.dispatch({type: BasketActionTypes.inc});
+  const count = props.basketControl.state.products
+    .find(pr => pr.id === props.product.id)?.count ?? 0;
+
+  const handlerAdd = function() {
+    props.basketControl.dispatch({type: BasketActionType.ADD, args: props.product});
   }
 
-  const handlerDecrement = function() {
-    props.basketControl.dispatch({type: BasketActionTypes.dec});
+  const handlerSub = function() {
+    props.basketControl.dispatch({type: BasketActionType.SUB, args: props.product});
   }
 
   return (
-    <div>
-      <div>
-        <pre>{JSON.stringify(props.product)}</pre>
+    <div className='product-card'>
+      <div className='product-card__content'>
+        <div className='product-card__title'>
+          {props.product.title}
+        </div>
+        <div className='product-card__description'>
+          {props.product.description}
+        </div>
+        <div className='product-card__price'>
+          Цена: {props.product.price} ₽
+        </div>
+        <div className='product-card__categories'>
+          {'Категории: '}
+          {
+            props.product.categories.map((ct, i) => (
+              <>
+              {i > 0 ? ', ' : ''}
+              <span key={ct} className='product-card__category'>{ct}</span>
+              </>
+            ))
+          }
+        </div>
+        <div className='product-card__producer'>
+          Производитель: {props.product.producer}
+        </div>
+        <div className='product-card__code'>
+          Штрихкод: {props.product.code}
+        </div>
       </div>
-      <button onClick={handlerIncrement}>Добавить</button>
-      <button onClick={handlerDecrement}>Убавить</button>
+      <div className='product-card__menu'>
+        <div className='product-card__menu-info'>
+          {`В корзине ${count} шт на ${count*props.product.price} ₽`}
+        </div>
+        <button className='product-card__btn' onClick={handlerAdd}>+</button>{' '}
+        <button className='product-card__btn' onClick={handlerSub}>–</button>
+      </div>
     </div>
   );
 }
