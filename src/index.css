@@ -17,7 +17,7 @@
 .header__content {
   display: flex;
   border: 1px solid gray;
-  padding: 20px;
+  padding: 10px;
   background-color: bisque;
   justify-content: space-between;
 }
@@ -28,7 +28,7 @@
 
 .footer {
   justify-self: flex-end;
-  margin-top: 10px;
+  margin: 10px 0;
 }
 .footer__content {
   padding: 20px;
@@ -40,6 +40,9 @@
   text-align: center;
 }
 
+.catalog {
+  margin-top: 10px;
+}
 .catalog__hot-categories {
   border: 1px solid gray;
 }
@@ -66,8 +69,8 @@
   display: flex;
   margin: 0;
   padding: 10px;
-  column-gap: 10px;
-  row-gap: 10px;
+  column-gap: 1em;
+  row-gap: 1em;
 }
 .hot-categories-list > li {
   list-style-type: none;
@@ -116,9 +119,8 @@
 .basket-products-list {
   display: flex;
   flex-direction: column;
-  column-gap: 10px;
-  row-gap: 10px;
   justify-content: flex-start;
+  row-gap: 10px;
   padding: 10px;
   border: 1px solid gray;
 }

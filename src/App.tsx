@@ -32,13 +32,12 @@ export function App() {
 
   document.title = 'Главная';
   let pageContent = (
-    <>
-      <h1>Main page</h1>
+    <div className='main-content'>
+      <h1>Главная</h1>
       <div><a href="#!catalog">Каталог</a></div>
       <div><a href="#!basket">Корзина</a></div>
       <div><a href="#!admin">Админка</a></div>
-      <div><a href="#anchor">Якорь обычный</a></div>
-    </>
+    </div>
   )
 
   if (urlHash === '#!catalog') {
