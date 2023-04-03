@@ -1,4 +1,5 @@
 
+
 export function isIntStr(str: string) {
   return /^\d+$/.test(str);
 }

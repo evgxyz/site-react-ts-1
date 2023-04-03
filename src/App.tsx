@@ -1,7 +1,7 @@
 
 import React, {useState, useEffect} from 'react';
 import {PageHeader} from './units/PageHeader'
-import {Basket, BasketTray, useBasketControl, BasketActionType, fetchBasket} from './units/Basket'
+import {Basket, BasketTray, useBasketControl, initBasket} from './units/Basket'
 import {Catalog} from './units/Catalog'
 
 export function App() {
@@ -22,13 +22,7 @@ export function App() {
   }
 
   useEffect(() => {initRouter()}, []);
-
-  async function initBasket() {
-    const basket = await fetchBasket();
-    basketControl.dispatch({type: BasketActionType.INIT, args: basket});
-  }
-
-  useEffect(() => {initBasket()}, []);
+  useEffect(() => {initBasket(basketControl)}, []);
 
   document.title = 'Главная';
   let pageContent = (

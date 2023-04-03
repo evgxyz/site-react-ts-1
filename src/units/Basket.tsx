@@ -225,6 +225,12 @@ function BasketProductCard(props: TBasketProductCardProps) {
   );
 } */
 
+// инициализация 
+export async function initBasket(basketControl: TBasketControl) {
+  const basket = await fetchBasket();
+  basketControl.dispatch({type: BasketActionType.INIT, args: basket});
+}
+
 // получение корзины из хранилища
 export async function fetchBasket() {
   console.log('call fetchBasket');
