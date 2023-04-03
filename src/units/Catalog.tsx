@@ -39,9 +39,11 @@ export function Catalog(props: TCatalogProps) {
   const updateProductList = useCallback(async function () {
     console.log('call updateProductList');
     if (updateFlag) {
-      setUpdateFlag(false);
       const newProductList = await fetchProducts(filterParams);
-      setProductList(newProductList);
+      setTimeout(() => {
+        setProductList(newProductList);
+        setUpdateFlag(false);
+      }, 1000);
     }
   }, [updateFlag, filterParams]);
   
@@ -86,6 +88,8 @@ export function Catalog(props: TCatalogProps) {
         </div>
         <div className='catalog__products-list'>
           { 
+            updateFlag ? <b>Загрузка...</b> :
+            productList.length > 0 ?
             productList.map(product => (
                 <ProductCard 
                   key={product.id} 
@@ -93,7 +97,7 @@ export function Catalog(props: TCatalogProps) {
                   basketControl={props.basketControl} 
                 />
               )
-            )
+            ) : <b>Нет результатов</b>
           }
         </div>
       </div>
@@ -263,7 +267,7 @@ function FilterProducers(props: TFilterProducersProps) {
       <div>
         <input type='text' value={queryProducers} placeholder='Найти' onChange={queryProducersOnChange} />
       </div>
-      <ul className='filter__producers-list'>
+      <ul className={['filter__producers-list', expanded ? '--expanded' : ''].join(' ')}>
         { 
           producersList.map(producer => {
               return (

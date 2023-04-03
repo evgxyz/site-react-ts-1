@@ -1,28 +1,18 @@
 
-import React, {useState, useEffect} from 'react';
-import {PageHeader} from './units/PageHeader'
-import {Basket, BasketTray, useBasketControl, initBasket} from './units/Basket'
+import React from 'react';
+import {useRouterControl, initRouter} from './units/router';
+import {Header} from './units/Header'
+import {useBasketControl, initBasket, Basket, BasketTray} from './units/Basket'
 import {Catalog} from './units/Catalog'
+import {ProductPage} from './units/Products'
 
 export function App() {
 
-  const [urlHash, setUrlHash] = useState(window.location.hash);
+  const [router, setRouter] = useRouterControl();
   const basketControl = useBasketControl();
 
-  function initRouter() {
-    window.addEventListener('hashchange', ev => {
-      const newUrlHash = (new URL(ev.newURL)).hash;
-      const oldUrlHash = (new URL(ev.oldURL)).hash;
-
-      const regex = /^#?$|^#!/;
-      if (regex.test(newUrlHash) || regex.test(oldUrlHash)) {
-        setUrlHash(newUrlHash);
-      }
-    });
-  }
-
-  useEffect(() => {initRouter()}, []);
-  useEffect(() => {initBasket(basketControl)}, []);
+  React.useEffect(() => {initRouter([router, setRouter])}, []);
+  React.useEffect(() => {initBasket(basketControl)}, []);
 
   document.title = 'Главная';
   let pageContent = (
@@ -34,17 +24,23 @@ export function App() {
     </div>
   )
 
-  if (urlHash === '#!catalog') {
+  if (router.hashHead === '#!catalog') {
     document.title = 'Каталог';
     pageContent = <Catalog basketControl={basketControl} />
   } 
   else 
-  if (urlHash === '#!basket') {
+  if (router.hashHead === '#!product') {
+    const productId = parseInt(router.hashParams['id']) ?? 0;
+    document.title = 'Продукт';
+    pageContent = <ProductPage productId={productId} basketControl={basketControl} />
+  } 
+  else
+  if (router.hashHead === '#!basket') {
     document.title = 'Корзина';
     pageContent = <Basket basketControl={basketControl} />
   } 
   else 
-  if (urlHash === '#!admin') {
+  if (router.hashHead === '#!admin') {
     document.title = 'Админка';
     pageContent = <h1>Админка</h1>
   }
@@ -62,7 +58,7 @@ export function App() {
     <div id='page-wrapper'>
       <div id='page-content'>
         {mainMenu}
-        <PageHeader 
+        <Header 
           basketTray={<BasketTray basketControl={basketControl} />} 
         />
         <main className='main'>{pageContent}</main>

@@ -2,8 +2,11 @@
 import React from 'react'
 
 export type TContextStateControl<T> = [
-  T,
-  React.Dispatch<React.SetStateAction<T>> | undefined
+  T, React.Dispatch<React.SetStateAction<T>>
+];
+
+export type TContextInitStateControl<T> = [
+  T, React.Dispatch<React.SetStateAction<T>> | undefined
 ];
 
 export function useContextStateControl<T>(

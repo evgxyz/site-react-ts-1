@@ -5,7 +5,7 @@ export interface TPageHeaderProps {
   basketTray: JSX.Element,
 }
 
-export function PageHeader(props: TPageHeaderProps) {
+export function Header(props: TPageHeaderProps) {
   return (
     <header className='header'>
       <div className='header__content'>

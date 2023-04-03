@@ -2,7 +2,6 @@
 import React, {useState, useEffect, useReducer} from 'react';
 import {TProduct, TProducer, TCategory, ProductCard} from './Products';
 
-
 export type TBasketProduct = TProduct & {count: number};
 
 export interface TBasket {

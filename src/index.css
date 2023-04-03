@@ -149,6 +149,26 @@
   font-weight: bold;
 }
 
+.product-page {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid gray;
+}
+.product-page__title {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+.product-page__price {
+  font-weight: bold;
+}
+.product-page__menu-info {
+  margin-bottom: 5px;
+}
+.product-page__btn {
+  font-size: large;
+  font-weight: bold;
+}
+
 .toggle-link {
   font-size: 0.9em;
   color: green;
