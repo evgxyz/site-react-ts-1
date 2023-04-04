@@ -70,6 +70,8 @@ export function Catalog(props: TCatalogProps) {
 
   useEffect(() => {updateProductList()}, [filterParams]);
 
+  document.title = 'Каталог';
+
   return (
     <div className='catalog'>
       <h1>Каталог</h1>

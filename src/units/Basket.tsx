@@ -140,6 +140,7 @@ interface TBasketProps {
 }
 
 export function Basket(props: TBasketProps) {
+  document.title = 'Корзина';
   return (
     <div className='basket'>
       <h1>Корзина</h1>

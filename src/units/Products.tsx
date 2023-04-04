@@ -103,6 +103,8 @@ export function ProductPage(props: TProductPageProps) {
     getProduct();
   }, []);
 
+  document.title = 'Продукт...';
+
   if (!product?.id) {
     return (
       <div className='product-page'>
@@ -127,6 +129,8 @@ export function ProductPage(props: TProductPageProps) {
   const handlerDel = function() {
     props.basketControl.dispatch({type: BasketActionType.DEL, args: product});
   }
+
+  document.title = 'Продукт ' + product.title;
 
   return (
     <div className='product-page'>

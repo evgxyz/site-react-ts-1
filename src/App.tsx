@@ -25,18 +25,15 @@ export function App() {
   )
 
   if (router.hashHead === '#!catalog') {
-    document.title = 'Каталог';
     pageContent = <Catalog basketControl={basketControl} />
   } 
   else 
   if (router.hashHead === '#!product') {
     const productId = parseInt(router.hashParams['id']) ?? 0;
-    document.title = 'Продукт';
     pageContent = <ProductPage productId={productId} basketControl={basketControl} />
   } 
   else
   if (router.hashHead === '#!basket') {
-    document.title = 'Корзина';
     pageContent = <Basket basketControl={basketControl} />
   } 
   else 

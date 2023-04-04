@@ -20,7 +20,7 @@ type TRouterControl = TContextStateControl<TRouter>;
 
 const defaultRouter: TRouter = {
   hashHead: '',
-  hashParams: {}
+  hashParams: {},
 };
 
 const defaultRouterControl: TInitRouterControl = [
