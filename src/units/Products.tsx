@@ -130,7 +130,7 @@ export function ProductPage(props: TProductPageProps) {
     props.basketControl.dispatch({type: BasketActionType.DEL, args: product});
   }
 
-  document.title = 'Продукт ' + product.title;
+  document.title = product.title;
 
   return (
     <div className='product-page'>
