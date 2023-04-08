@@ -22,12 +22,17 @@ export interface TBasketAction {
   args?: any
 }
 
-export type TBasketDispatch = React.Dispatch<TBasketAction>
+/* export type TBasketDispatch = 
 
 export interface TBasketControl {
   state: TBasket,
   dispatch: TBasketDispatch
-}
+} */
+
+export type TBasketControl = [
+  TBasket,
+  React.Dispatch<TBasketAction>
+]
 
 const defaultBasket: TBasket = {
   products: [],
@@ -35,87 +40,88 @@ const defaultBasket: TBasket = {
   totalPrice: 0,
 }
 
-function basketReducer(state: TBasket, action: TBasketAction) {
+function basketReducer(basket: TBasket, action: TBasketAction) {
+  
   switch (action.type) {
 
     case BasketActionType.INIT: {
-      const newState = action.args as TBasket;
-      localStorage.setItem('basket', JSON.stringify(newState));
-      return newState;
+      const newBasket = action.args as TBasket;
+      localStorage.setItem('basket', JSON.stringify(newBasket));
+      return newBasket;
     }
     
     case BasketActionType.ADD: {
-      let newState: TBasket;
+      let newBasket: TBasket;
       const product = action.args as TProduct;
-      const index = state.products.findIndex(pr => pr.id === product.id);
+      const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
-        state.products[index].count++;
-        const totalPrice = state.products.reduce((s, pr) => (s + pr.price*pr.count), 0);
-        newState = { ...state, 
-          totalPrice: totalPrice
+        basket.products[index].count++;
+        newBasket = { ...basket, 
+          totalPrice: getTotalPrice(basket.products)
         };
       }
       else {
-        state.products.push({...product, count: 1});
-        const totalPrice = state.products.reduce((s, pr) => (s + pr.price*pr.count), 0);
-        newState = { ...state, 
-          totalCount: state.products.length,
-          totalPrice: totalPrice
+        basket.products.push({...product, count: 1});
+        newBasket = { ...basket, 
+          totalCount: basket.products.length,
+          totalPrice: getTotalPrice(basket.products)
         };
       }
-      localStorage.setItem('basket', JSON.stringify(newState));
-      return newState;
+      localStorage.setItem('basket', JSON.stringify(newBasket));
+      return newBasket;
     }
 
     case BasketActionType.SUB: {
-      let newState: TBasket;
+      let newBasket: TBasket;
       const product = action.args as TProduct;
-      const index = state.products.findIndex(pr => pr.id === product.id);
+      const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
-        state.products[index].count--;
-        if (state.products[index].count <= 0) {
-          state.products.splice(index, 1);
+        basket.products[index].count--;
+        if (basket.products[index].count <= 0) {
+          basket.products.splice(index, 1);
         }
-        const totalPrice = state.products.reduce((s, pr) => (s + pr.price*pr.count), 0);
-        newState = { ...state, 
-          totalCount: state.products.length,
-          totalPrice: totalPrice
+        newBasket = { ...basket, 
+          totalCount: basket.products.length,
+          totalPrice: getTotalPrice(basket.products)
         };
       }
       else {
-        newState = state
+        newBasket = basket
       }
-      localStorage.setItem('basket', JSON.stringify(newState));
-      return newState;
+      localStorage.setItem('basket', JSON.stringify(newBasket));
+      return newBasket;
     }
 
     case BasketActionType.DEL: {
-      let newState: TBasket;
+      let newBasket: TBasket;
       const product = action.args as TProduct;
-      const index = state.products.findIndex(pr => pr.id === product.id);
+      const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
-        state.products.splice(index, 1);
-        const totalPrice = state.products.reduce((s, pr) => (s + pr.price*pr.count), 0);
-        newState = { ...state, 
-          totalCount: state.products.length,
-          totalPrice: totalPrice
+        basket.products.splice(index, 1);
+        newBasket = { ...basket, 
+          totalCount: basket.products.length,
+          totalPrice: getTotalPrice(basket.products)
         };
       }
       else {
-        newState = state
+        newBasket = basket
       }
-      localStorage.setItem('basket', JSON.stringify(newState));
-      return newState;
+      localStorage.setItem('basket', JSON.stringify(newBasket));
+      return newBasket;
     }
 
     default: 
-      return state;
+      return basket;
+  }
+
+  function getTotalPrice(products: TBasketProduct[]) {
+    return products.reduce((s, pr) => (s + pr.price*pr.count), 0);
   }
 }
 
-export function useBasketControl(): TBasketControl {
-  const [state, dispatch] = useReducer(basketReducer, defaultBasket);
-  return {state, dispatch};
+// контроль корзины
+export function useBasketReducer() {
+  return useReducer(basketReducer, defaultBasket);
 }
 
 // корзина трей
@@ -124,11 +130,13 @@ interface TBasketTrayProps {
 }
 
 export function BasketTray(props: TBasketTrayProps) {
+
+  const [basket, ] = props.basketControl;
+
   return (
     <div style={{color: 'blue'}}>
       <a href='#!basket'>
-      В корзине товаров {props.basketControl.state.totalCount} {' '}
-      на {props.basketControl.state.totalPrice} ₽
+        В корзине товаров {basket.totalCount} на {basket.totalPrice} ₽
       </a>
     </div>
   );
@@ -140,95 +148,34 @@ interface TBasketProps {
 }
 
 export function Basket(props: TBasketProps) {
+
+  const [basket, ] = props.basketControl;
+  
   document.title = 'Корзина';
+  
   return (
     <div className='basket'>
       <h1>Корзина</h1>
       <div className='basket-products-list'>
         {
-          props.basketControl.state.products.map(product => (
+          basket.products.map(product => (
             <ProductCard 
               key={product.id} 
               product={product} 
               basketControl={props.basketControl} 
             />
-          )
-        )
+          ))
         }
       </div>
     </div>
   );
 }
 
-// карточка продукта 
-/* interface TBasketProductCardProps {
-  product: TProduct,
-  basketControl: TBasketControl
-}
-
-function BasketProductCard(props: TBasketProductCardProps) {
-
-  const count = props.basketControl.state.products
-    .find(pr => pr.id === props.product.id)?.count ?? 0;
-
-  const handlerAdd = function() {
-    props.basketControl.dispatch({type: BasketActionType.ADD, args: props.product});
-  }
-
-  const handlerSub = function() {
-    props.basketControl.dispatch({type: BasketActionType.SUB, args: props.product});
-  }
-
-  const handlerDel = function() {
-    props.basketControl.dispatch({type: BasketActionType.DEL, args: props.product});
-  }
-
-  return (
-    <div className='product-card'>
-      <div className='product-card__content'>
-        <div className='product-card__title'>
-          {props.product.title}
-        </div>
-        <div className='product-card__description'>
-          {props.product.description}
-        </div>
-        <div className='product-card__price'>
-          Цена: {props.product.price} ₽
-        </div>
-        <div className='product-card__categories'>
-          {'Категории: '}
-          {
-            props.product.categories.map((ct, i) => (
-              <>
-              {i > 0 ? ', ' : ''}
-              <span key={ct} className='product-card__category'>{ct}</span>
-              </>
-            ))
-          }
-        </div>
-        <div className='product-card__producer'>
-          Производитель: {props.product.producer}
-        </div>
-        <div className='product-card__code'>
-          Штрихкод: {props.product.code}
-        </div>
-      </div>
-      <div className='product-card__menu'>
-        <div className='product-card__menu-info'>
-          {`В корзине ${count} шт на ${count*props.product.price} ₽`}
-        </div>
-        <button className='product-card__btn' onClick={handlerAdd}>+</button>{' '}
-        <button className='product-card__btn' onClick={handlerSub}>–</button>
-        <button className='product-card__btn' onClick={handlerDel}>X</button>
-      </div>
-    </div>
-  );
-} */
-
-// инициализация 
+// инициализация корзины
 export async function initBasket(basketControl: TBasketControl) {
+  const [ , basketDispatch] = basketControl;
   const basket = await fetchBasket();
-  basketControl.dispatch({type: BasketActionType.INIT, args: basket});
+  basketDispatch({type: BasketActionType.INIT, args: basket});
 }
 
 // получение корзины из хранилища

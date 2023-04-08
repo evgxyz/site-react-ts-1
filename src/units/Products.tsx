@@ -35,19 +35,21 @@ export interface TProductCardProps {
 
 export function ProductCard(props: TProductCardProps) {
 
-  const count = props.basketControl.state.products
+  const [basket, basketDispatch] = props.basketControl;
+
+  const count = basket.products
     .find(pr => pr.id === props.product.id)?.count ?? 0;
 
   function basketAdd() {
-    props.basketControl.dispatch({type: BasketActionType.ADD, args: props.product});
+    basketDispatch({type: BasketActionType.ADD, args: props.product});
   }
 
   function basketSub() {
-    props.basketControl.dispatch({type: BasketActionType.SUB, args: props.product});
+    basketDispatch({type: BasketActionType.SUB, args: props.product});
   }
 
   function basketDel() {
-    props.basketControl.dispatch({type: BasketActionType.DEL, args: props.product});
+    basketDispatch({type: BasketActionType.DEL, args: props.product});
   }
 
   return (
@@ -96,6 +98,8 @@ export function ProductPage(props: TProductPageProps) {
   const [router, setRouter] = useRouterControl();
   const productId = parseInt(router.hashParams['id']);
 
+  const [basket, basketDispatch] = props.basketControl;
+
   const [product, setProduct] = React.useState({} as TProduct);
 
   async function getProduct() {
@@ -129,19 +133,19 @@ export function ProductPage(props: TProductPageProps) {
     )
   }
 
-  const count = props.basketControl.state.products
+  const count = basket.products
     .find(pr => pr.id === productId)?.count ?? 0;
 
   function basketAdd() {
-    props.basketControl.dispatch({type: BasketActionType.ADD, args: product});
+    basketDispatch({type: BasketActionType.ADD, args: product});
   }
 
   function basketSub() {
-    props.basketControl.dispatch({type: BasketActionType.SUB, args: product});
+    basketDispatch({type: BasketActionType.SUB, args: product});
   }
 
   function basketDel() {
-    props.basketControl.dispatch({type: BasketActionType.DEL, args: product});
+    basketDispatch({type: BasketActionType.DEL, args: product});
   }
 
   document.title = product.title;
@@ -159,7 +163,7 @@ export function ProductPage(props: TProductPageProps) {
           Цена: {product.price} ₽
         </div>
         <div className='product-page__categories'>
-          { 'Категории: ' + product.categories.join(', ') }
+          {'Категории: ' + product.categories.join(', ')}
         </div>
         <div className='product-page__producer'>
           Производитель: {product.producer}
@@ -180,9 +184,9 @@ export function ProductPage(props: TProductPageProps) {
   );
 }
 
-// получение корзины из хранилища
+// получение продукта
 export async function fetchProduct(productId: number)  {
-  console.log('call fetchProduct, productId=' + productId);
+  console.log('call fetchProduct, productId=' + productId); 
   const productsAll: TProduct[] = 
     (JSON.parse(localStorage.getItem('products') ?? 'null')) ?? [];
   const product = productsAll.find(pr => pr.id === productId) as TProduct;

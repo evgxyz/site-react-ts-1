@@ -2,14 +2,14 @@
 import React from 'react';
 import {useRouterControl, initRouter} from './units/router';
 import {Header} from './units/Header'
-import {useBasketControl, initBasket, Basket, BasketTray} from './units/Basket'
+import {useBasketReducer, initBasket, Basket, BasketTray} from './units/Basket'
 import {Catalog} from './units/Catalog'
 import {ProductPage} from './units/Products'
 
 export function App() {
 
   const [router, setRouter] = useRouterControl();
-  const basketControl = useBasketControl();
+  const basketControl = useBasketReducer();
 
   React.useEffect(() => {initRouter([router, setRouter])}, []);
   React.useEffect(() => {initBasket(basketControl)}, []);

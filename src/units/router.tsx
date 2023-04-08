@@ -1,10 +1,9 @@
 
 import React from 'react';
 import {
-  TContextInitStateControl, 
-  TContextStateControl, 
+  TStateControl0, TStateControl, 
   useContextStateControl
-} from './contextStateControl'
+} from './stateControl'
 
 export interface THashParams {
   [key: string]: string
@@ -15,15 +14,15 @@ export interface TRouter {
   hashParams: THashParams,
 };
 
-type TInitRouterControl = TContextInitStateControl<TRouter>;
-type TRouterControl = TContextStateControl<TRouter>;
+type TRouterControl0 = TStateControl0<TRouter>;
+type TRouterControl = TStateControl<TRouter>;
 
 const defaultRouter: TRouter = {
   hashHead: '',
   hashParams: {},
 };
 
-const defaultRouterControl: TInitRouterControl = [
+const defaultRouterControl: TRouterControl0 = [
   defaultRouter,
   undefined,
 ];
