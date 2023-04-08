@@ -4,7 +4,7 @@ import {useRouterControl, initRouter} from './units/router';
 import {Header} from './units/Header'
 import {useBasketReducer, initBasket, Basket, BasketTray} from './units/Basket'
 import {Catalog} from './units/Catalog'
-import {ProductPage} from './units/Products'
+import {ProductPage} from './units/Product'
 
 export function App() {
 

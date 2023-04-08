@@ -96,7 +96,11 @@ export interface TProductPageProps {
 export function ProductPage(props: TProductPageProps) {
 
   const [router, setRouter] = useRouterControl();
-  const productId = parseInt(router.hashParams['id']);
+
+  let productId = parseInt(router.hashParams['id']);
+  if (!isFinite(productId)) {
+    productId = 0;
+  }
 
   const [basket, basketDispatch] = props.basketControl;
 

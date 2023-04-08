@@ -1,5 +1,5 @@
 
-import {TCategory} from '../units/Products'
+import {TCategory} from '../units/Product'
 
 export const initCategories: TCategory[] = [
   {

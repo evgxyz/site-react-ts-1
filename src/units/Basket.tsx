@@ -1,6 +1,6 @@
 
 import React, {useState, useEffect, useReducer} from 'react';
-import {TProduct, TProducer, TCategory, ProductCard} from './Products';
+import {TProduct, TProducer, TCategory, ProductCard} from './Product';
 
 export type TBasketProduct = TProduct & {count: number};
 

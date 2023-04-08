@@ -3,7 +3,7 @@ import React from 'react';
 import {isIntStr, mergeObj, addObj} from './utils';
 import {useRouterControl} from './router';
 import {TBasketControl} from './Basket';
-import {TProduct, TProducer, TCategory, ProductCard} from './Products';
+import {TProduct, TProducer, TCategory, ProductCard} from './Product';
 import {initProducts} from '../data/products';
 import {initProducers} from '../data/producers';
 import {initCategories} from '../data/categories';
@@ -46,7 +46,11 @@ export interface TCatalogProps {
 export function Catalog(props: TCatalogProps) {
 
   const [router, setRouter] = useRouterControl();
-  const page = parseInt(router.hashParams['page']);
+
+  let page = parseInt(router.hashParams['page']);
+  if (!isFinite(page)) {
+    page = 1;
+  }
 
   const [catalogParams, setCatalogParams] = React.useState(defaultCatalogParams);
   const [catalogResult, setCatalogResult] = React.useState(defaultCatalogResult);

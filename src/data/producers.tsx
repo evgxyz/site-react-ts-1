@@ -1,5 +1,5 @@
 
-import {TProducer} from '../units/Products'
+import {TProducer} from '../units/Product'
 
 export const initProducers: TProducer[] = [
   {
