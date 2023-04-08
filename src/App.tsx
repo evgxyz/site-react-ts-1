@@ -29,8 +29,7 @@ export function App() {
   } 
   else 
   if (router.hashHead === '#!product') {
-    const productId = parseInt(router.hashParams['id']) ?? 0;
-    pageContent = <ProductPage productId={productId} basketControl={basketControl} />
+    pageContent = <ProductPage basketControl={basketControl} />
   } 
   else
   if (router.hashHead === '#!basket') {

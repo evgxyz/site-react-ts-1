@@ -46,22 +46,25 @@
 .catalog__hot-categories {
   border: 1px solid gray;
 }
-.catalog__products {
+.catalog__body {
   display: flex;
   border: 1px solid gray;
   border-top-width: 0;
 }
-.catalog__products-filter {
+.catalog__filter {
   flex-basis: 10rem;
   padding: 10px;
   border-right: 1px solid gray;
 }
-.catalog__products-list {
+.catalog__products {
   display: flex;
   flex-wrap: wrap;
   column-gap: 10px;
   row-gap: 10px;
   align-items: flex-start;
+  padding: 10px;
+}
+.catalog__products-pagination {
   padding: 10px;
 }
 

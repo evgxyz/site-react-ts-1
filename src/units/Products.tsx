@@ -3,6 +3,7 @@ import React from 'react';
 import {useRouterControl} from './router';
 import {TBasketControl, BasketActionType} from './Basket';
 
+// продукт
 export interface TProduct {
   id: number,
   title: string,
@@ -13,11 +14,13 @@ export interface TProduct {
   categories: string[],
 }
 
+// производитель
 export interface TProducer {
   id: number,
   title: string,
 }
 
+// категория
 export interface TCategory {
   id: number,
   title: string,
@@ -35,15 +38,15 @@ export function ProductCard(props: TProductCardProps) {
   const count = props.basketControl.state.products
     .find(pr => pr.id === props.product.id)?.count ?? 0;
 
-  const handlerAdd = function() {
+  function basketAdd() {
     props.basketControl.dispatch({type: BasketActionType.ADD, args: props.product});
   }
 
-  const handlerSub = function() {
+  function basketSub() {
     props.basketControl.dispatch({type: BasketActionType.SUB, args: props.product});
   }
 
-  const handlerDel = function() {
+  function basketDel() {
     props.basketControl.dispatch({type: BasketActionType.DEL, args: props.product});
   }
 
@@ -62,8 +65,7 @@ export function ProductCard(props: TProductCardProps) {
           Цена: {props.product.price} ₽
         </div>
         <div className='product-card__categories'>
-          { 'Категории: '
-            + props.product.categories.map((ct, i) => (i > 0 ? ', ' : '') + ct) }
+          { 'Категории: ' + props.product.categories.join(', ') }
         </div>
         <div className='product-card__producer'>
           Производитель: {props.product.producer}
@@ -76,9 +78,9 @@ export function ProductCard(props: TProductCardProps) {
         <div className='product-card__menu-info'>
           {`В корзине ${count} шт на ${count*props.product.price} ₽`}
         </div>
-        <button className='product-card__btn' onClick={handlerAdd}>+</button>{' '}
-        <button className='product-card__btn' onClick={handlerSub}>–</button>{' '}
-        <button className='product-card__btn' onClick={handlerDel}>x</button>
+        <button className='product-card__btn' onClick={basketAdd}>+</button>{' '}
+        <button className='product-card__btn' onClick={basketSub}>–</button>{' '}
+        <button className='product-card__btn' onClick={basketDel}>x</button>
       </div>
     </div>
   );
@@ -86,47 +88,59 @@ export function ProductCard(props: TProductCardProps) {
 
 // страница продукта 
 export interface TProductPageProps {
-  productId: number,
   basketControl: TBasketControl
 }
 
 export function ProductPage(props: TProductPageProps) {
 
+  const [router, setRouter] = useRouterControl();
+  const productId = parseInt(router.hashParams['id']);
+
   const [product, setProduct] = React.useState({} as TProduct);
 
   async function getProduct() {
-    const product = await fetchProduct(props.productId);
-    setTimeout(() => setProduct(product), 1000);
+    const product = await fetchProduct(productId);
+    setTimeout(() => setProduct(product), 500);
   }
 
   React.useEffect(() => {
     getProduct();
   }, []);
 
-  document.title = 'Продукт...';
-
-  if (!product?.id) {
+  if (!product) {
+    document.title = 'Продукт не найден';
     return (
       <div className='product-page'>
         <div className='product-page__content'>
-         { product ? <b>Загрузка...</b> : <b>Продукт не найден</b> }
+         <b>Продукт не найден</b>
+        </div>
+      </div>
+    )
+  }
+
+  if (!product.id) {
+    document.title = 'Загрузка...';
+    return (
+      <div className='product-page'>
+        <div className='product-page__content'>
+         <b>Загрузка...</b>
         </div>
       </div>
     )
   }
 
   const count = props.basketControl.state.products
-    .find(pr => pr.id === props.productId)?.count ?? 0;
+    .find(pr => pr.id === productId)?.count ?? 0;
 
-  const handlerAdd = function() {
+  function basketAdd() {
     props.basketControl.dispatch({type: BasketActionType.ADD, args: product});
   }
 
-  const handlerSub = function() {
+  function basketSub() {
     props.basketControl.dispatch({type: BasketActionType.SUB, args: product});
   }
 
-  const handlerDel = function() {
+  function basketDel() {
     props.basketControl.dispatch({type: BasketActionType.DEL, args: product});
   }
 
@@ -145,8 +159,7 @@ export function ProductPage(props: TProductPageProps) {
           Цена: {product.price} ₽
         </div>
         <div className='product-page__categories'>
-          { 'Категории: '
-            + product.categories.map((ct, i) => (i > 0 ? ', ' : '') + ct) }
+          { 'Категории: ' + product.categories.join(', ') }
         </div>
         <div className='product-page__producer'>
           Производитель: {product.producer}
@@ -159,9 +172,9 @@ export function ProductPage(props: TProductPageProps) {
         <div className='product-page__menu-info'>
           {`В корзине ${count} шт на ${count*product.price} ₽`}
         </div>
-        <button className='product-page__btn' onClick={handlerAdd}>+</button>{' '}
-        <button className='product-page__btn' onClick={handlerSub}>–</button>{' '}
-        <button className='product-page__btn' onClick={handlerDel}>x</button>
+        <button className='product-page__btn' onClick={basketAdd}>+</button>{' '}
+        <button className='product-page__btn' onClick={basketSub}>–</button>{' '}
+        <button className='product-page__btn' onClick={basketDel}>x</button>
       </div>
     </div>
   );

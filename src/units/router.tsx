@@ -6,11 +6,11 @@ import {
   useContextStateControl
 } from './contextStateControl'
 
-interface THashParams {
+export interface THashParams {
   [key: string]: string
 }
 
-interface TRouter {
+export interface TRouter {
   hashHead: string,
   hashParams: THashParams,
 };
