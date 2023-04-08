@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {useRouterControl} from './router';
+import {useRouterControl} from './Router';
 import {TBasketControl, BasketActionType} from './Basket';
 
 // продукт

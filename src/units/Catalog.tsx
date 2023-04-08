@@ -1,7 +1,7 @@
 
 import React from 'react';
 import {isIntStr, mergeObj, addObj} from './utils';
-import {useRouterControl} from './router';
+import {useRouterControl} from './Router';
 import {TBasketControl} from './Basket';
 import {TProduct, TProducer, TCategory, ProductCard} from './Product';
 import {initProducts} from '../data/products';

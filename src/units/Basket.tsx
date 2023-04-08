@@ -1,6 +1,6 @@
 
-import React, {useState, useEffect, useReducer} from 'react';
-import {TProduct, TProducer, TCategory, ProductCard} from './Product';
+import React from 'react';
+import {TProduct, ProductCard} from './Product';
 
 export type TBasketProduct = TProduct & {count: number};
 
@@ -21,13 +21,6 @@ export interface TBasketAction {
   type: BasketActionType,
   args?: any
 }
-
-/* export type TBasketDispatch = 
-
-export interface TBasketControl {
-  state: TBasket,
-  dispatch: TBasketDispatch
-} */
 
 export type TBasketControl = [
   TBasket,
@@ -121,7 +114,7 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
 
 // контроль корзины
 export function useBasketReducer() {
-  return useReducer(basketReducer, defaultBasket);
+  return React.useReducer(basketReducer, defaultBasket);
 }
 
 // корзина трей

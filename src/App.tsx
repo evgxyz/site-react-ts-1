@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {useRouterControl, initRouter} from './units/router';
+import {useRouterControl, initRouter} from './units/Router';
 import {Header} from './units/Header'
 import {useBasketReducer, initBasket, Basket, BasketTray} from './units/Basket'
 import {Catalog} from './units/Catalog'
