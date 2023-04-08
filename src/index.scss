@@ -78,17 +78,39 @@
     border-right: 1px solid gray;
   }
 
+  &__result {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    //@include debug-border(blue);  
+  }
+
   &__products {
     display: flex;
+    flex-grow: 1;
     flex-wrap: wrap;
     column-gap: 10px;
     row-gap: 10px;
     align-items: flex-start;
     padding: 10px;
+    //@include debug-border(green);
   }
 
   &__products-pagination {
     padding: 10px;
+    border-top: 1px solid gray;
+
+    & a {
+      text-decoration: none;
+    }
+    //@include debug-border(green);
+  }
+
+  &__msg {
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
   }
 }
 

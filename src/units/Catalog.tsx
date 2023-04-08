@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {isIntStr, mergeObj, addObj} from './utils';
+import {isIntStr, mergeObj, addObj, range} from './utils';
 import {useRouterControl} from './Router';
 import {TBasketControl} from './Basket';
 import {TProduct, TProducer, TCategory, ProductCard} from './Product';
@@ -13,7 +13,8 @@ interface TCatalogParams {
   priceTo: number,
   producers: (TProducer & {checked: boolean})[],
   categories: (TCategory & {checked: boolean})[],
-  updateFlag: boolean,
+  updateResultFlag: boolean,
+  resetPageFlag: boolean,
 }
 
 interface TCatalogResult {
@@ -29,7 +30,8 @@ const defaultCatalogParams: TCatalogParams = {
   priceTo: defaultPriceTo, 
   producers: [],
   categories: [],
-  updateFlag: false,
+  updateResultFlag: false,
+  resetPageFlag: false,
 }
 
 const defaultCatalogResult: TCatalogResult = {
@@ -57,10 +59,19 @@ export function Catalog(props: TCatalogProps) {
 
   const updateCatalogResult = React.useCallback(async function () {
     console.log('call updateCatalogResult');
-    if (catalogParams.updateFlag) {    
+
+    if (catalogParams.updateResultFlag) {   
+
+      if (catalogParams.resetPageFlag && page !== 1) {
+        window.location.hash = '#!catalog?page=1';
+        return;
+      }
+
       const {products, totalPages} = await fetchProducts(catalogParams, page);
       setTimeout(() => {
-        setCatalogParams(cp => mergeObj(cp, {updateFlag: false}));
+        setCatalogParams(cp => mergeObj(cp, {
+          updateResultFlag: false
+        }));
         setCatalogResult(cr => mergeObj(cr, {
           products: products,
           totalPages: totalPages,
@@ -83,7 +94,8 @@ export function Catalog(props: TCatalogProps) {
       return mergeObj(cp, {
         producers: producers,
         categories: categories,
-        updateFlag: true
+        updateResultFlag: true,
+        resetPageFlag: false,
       }
     )});
   }
@@ -97,7 +109,10 @@ export function Catalog(props: TCatalogProps) {
   }, [catalogParams, updateCatalogResult]);
 
   React.useEffect(() => {
-    setCatalogParams(cp => mergeObj(cp, {updateFlag: true}));
+    setCatalogParams(cp => mergeObj(cp, {
+      updateResultFlag: true,
+      resetPageFlag: false
+    }));
   }, [page]);
 
   document.title = 'Каталог [' + page + ']';
@@ -117,28 +132,39 @@ export function Catalog(props: TCatalogProps) {
           />
         </div>
         <div className='catalog__result'>
-          <div className='catalog__products'>
-            { 
-              catalogParams.updateFlag ? <b>Загрузка...</b> :
-              catalogResult.products.length > 0 ?
-              catalogResult.products.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  basketControl={props.basketControl} 
-                />)
-              ) : <b>Нет результатов</b>
-            }
-          </div>
-          <div className='catalog__products-pagination'>
-            { 
-              Array.from(Array(catalogResult.totalPages).keys()).map(i => 
-                <span key={i+1}>
-                  <a href={'#!catalog?page='+(i+1)}>{i+1}</a>{' '}
-                </span> 
-              )
-            }
-          </div>
+          {
+            catalogParams.updateResultFlag ? 
+              <div className='catalog__msg'>
+                <div><b>Загрузка...</b></div>
+              </div> 
+            : 
+              <>
+              <div className='catalog__products'>
+                { 
+                  catalogResult.products.length > 0 ?
+                    catalogResult.products.map(product => (
+                      <ProductCard 
+                        key={product.id} 
+                        product={product} 
+                        basketControl={props.basketControl} 
+                      />
+                    )) 
+                  : 
+                    <b>Нет результатов</b>
+                }
+              </div>
+              <div className='catalog__products-pagination'>
+                { 
+                  range(1, catalogResult.totalPages).map(i => (
+                    <span key={i}>
+                      { i > 1 ? ' | ' : '' }
+                      { i !== page ? <a href={'#!catalog?page='+(i)}>{i}</a> : <b>{i}</b> }
+                    </span> 
+                  ))
+                }
+              </div>
+              </>
+          }
         </div>
       </div>
     </div>
@@ -161,7 +187,10 @@ function Filter(props: TFilterProps) {
   // отправить форму
   function filterFormSubmit(ev: React.SyntheticEvent) {
     ev.preventDefault();
-    setCatalogParams(cp => mergeObj(cp, {updateFlag: true}));
+    setCatalogParams(cp => mergeObj(cp, {
+      updateResultFlag: true,
+      resetPageFlag: true
+    }));
   }
 
   return (
@@ -417,7 +446,11 @@ function HotCategories(props: THotCategoriesProps) {
       const categories = cp.categories.map(
         ct => (ct.id == categoryId) ? addObj(ct, {checked: !ct.checked}) : ct
       );
-      return mergeObj(cp, {categories: categories, updateFlag: true})
+      return mergeObj(cp, {
+        categories: categories, 
+        updateResultFlag: true,
+        resetPageFlag: true
+      })
     });
   }
   
@@ -449,6 +482,7 @@ function HotCategories(props: THotCategoriesProps) {
 
 // получение списка продкутов с "сервера"
 async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
+  console.log('call fetchProducts');
 
   const perPage = 6;
   page = Math.max(1, page);
@@ -489,9 +523,9 @@ async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
 
 // получение списка производителей с "сервера"
 async function fetchProducers(query: string = '') {
+  console.log('call fetchProducers');
   query = query.trim();
   const producersAll: TProducer[] = JSON.parse(String(localStorage.getItem('producers'))) ?? [];
-  
   const producers = producersAll.filter(x =>
     x.title.toLowerCase().includes(query.toLowerCase())
   )
@@ -503,6 +537,7 @@ async function fetchProducers(query: string = '') {
 
 // получение списка категорий с "сервера"
 async function fetchCategories() {
+  console.log('call fetchCategories');
   const categoriesAll: TCategory[] = (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
   const categories = categoriesAll.sort(
     (x, y) => (x.title === y.title ? 0 : x.title > y.title ? 1 : -1)
