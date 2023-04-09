@@ -75,14 +75,14 @@ export function initRouter(routerControl: TRouterControl) {
   });
 }
 
-function parseHash(hash: string) {
+/* function parseHash(hash: string) {
 
   console.log('call parseHash')
 
   let hashHead = '';
   let hashParams = {} as THashParams;
 
-  const matches = hash.match(/^(#![\w-]+)(?:\?([&=\w]+))?/i);
+  const matches = hash.match(/^(#![\w-]+)(?:\?([&=\w,]+))?/i);
 
   if (matches) { 
     hashHead = matches[1];
@@ -95,6 +95,29 @@ function parseHash(hash: string) {
             hashParams[key] = val;
           }
         });
+    }
+  }
+
+  return [
+    hashHead,
+    hashParams
+  ] as [string, THashParams]
+} */
+
+function parseHash(hash: string) {
+  console.log('call parseHash')
+
+  let hashHead = '';
+  let hashParams: THashParams = {};
+
+  const matches = hash.match(/^(#![\w-]+)(?:\?(.+))?/i);
+
+  if (matches) { 
+    hashHead = matches[1];
+    
+    if (matches[2]) {
+      const query = new URLSearchParams(matches[2]);
+      hashParams = Object.fromEntries(query.entries());
     }
   }
 

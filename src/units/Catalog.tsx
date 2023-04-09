@@ -51,11 +51,13 @@ export function Catalog(props: TCatalogProps) {
 
   const [router, setRouter] = useRouterControl();
 
+  // номер страницы
   let page = parseInt(router.hashParams['page']);
   if (!isFinite(page)) {
     page = 1;
   }
 
+  // цена
   let priceFr = parseInt(router.hashParams['priceFr']);
   if (!isFinite(priceFr)) {
     priceFr = defaultPriceFr;
@@ -65,6 +67,14 @@ export function Catalog(props: TCatalogProps) {
   if (!isFinite(priceTo)) {
     priceTo = defaultPriceTo;
   }
+
+  // производители
+  let producerIds = (router.hashParams['producerIds'] ?? '')
+    .split('_').map(s => parseInt(s)).filter(id => isFinite(id));
+
+  // категории
+  let categoryIds = (router.hashParams['categoryIds'] ?? '')
+    .split('_').map(s => parseInt(s)).filter(id => isFinite(id));
 
   const [catalogParams, setCatalogParams] = React.useState(defaultCatalogParams);
   const [catalogResult, setCatalogResult] = React.useState(defaultCatalogResult);
@@ -99,13 +109,17 @@ export function Catalog(props: TCatalogProps) {
   async function initCatalogParams() {
     console.log('call initCatalog');
 
-    // производитель
+    // производители
     const producersAll = await fetchProducers();
-    const producers = producersAll.map(pr => mergeObj(pr, {checked: false}));
+    const producers = producersAll.map(pr => 
+      mergeObj(pr, {checked: producerIds.includes(pr.id)})
+    );
 
-    // производитель
+    // категории
     const categoriesAll = await fetchCategories();
-    const categories = categoriesAll.map(ct => mergeObj(ct, {checked: false}));
+    const categories = categoriesAll.map(ct => 
+      mergeObj(ct, {checked: categoryIds.includes(ct.id)})
+    );
 
     setCatalogParams(cp => { 
       return mergeObj(cp, {
@@ -497,8 +511,36 @@ function HotCategories(props: THotCategoriesProps) {
 // параметры фильтра в строку параметров
 function catalogParamsHashQuery(catalogParams: TCatalogParams) {
   let query = new URLSearchParams();
-  query.append('priceFr', catalogParams.priceFr.toString());
-  query.append('priceTo', catalogParams.priceTo.toString());
+  
+  //цена
+  if (catalogParams.priceFr !== defaultPriceFr) {
+    query.append('priceFr', catalogParams.priceFr.toString());
+  }
+
+  if (catalogParams.priceTo !== defaultPriceTo) {
+    query.append('priceTo', catalogParams.priceTo.toString());
+  }
+  
+  //производители
+  const producerIdsStr = catalogParams.producers
+    .filter(pr => pr.checked)
+    .map(pr => pr.id.toString())
+    .join('_');
+
+  if (producerIdsStr !== '') {
+    query.append('producerIds', producerIdsStr);
+  }
+  
+  //категории
+  const categoryIdsStr = catalogParams.categories
+    .filter(ct => ct.checked)
+    .map(ct => ct.id.toString())
+    .join('_');
+  
+  if (categoryIdsStr !== '') {
+    query.append('categoryIds', categoryIdsStr);
+  }
+
   return query;
 }
 
@@ -549,7 +591,8 @@ async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
 async function fetchProducers(query: string = '') {
   console.log('call fetchProducers');
   query = query.trim();
-  const producersAll: TProducer[] = JSON.parse(String(localStorage.getItem('producers'))) ?? [];
+  const producersAll: TProducer[] = 
+    (JSON.parse(String(localStorage.getItem('producers'))) ?? []);
   const producers = producersAll.filter(x =>
     x.title.toLowerCase().includes(query.toLowerCase())
   )
@@ -562,7 +605,8 @@ async function fetchProducers(query: string = '') {
 // получение списка категорий с "сервера"
 async function fetchCategories() {
   console.log('call fetchCategories');
-  const categoriesAll: TCategory[] = (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
+  const categoriesAll: TCategory[] = 
+    (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
   const categories = categoriesAll.sort(
     (x, y) => (x.title === y.title ? 0 : x.title > y.title ? 1 : -1)
   );
