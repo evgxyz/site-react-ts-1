@@ -15,6 +15,7 @@ interface TCatalogParams {
   categories: (TCategory & {checked: boolean})[],
   updateResultFlag: boolean,
   resetPageFlag: boolean,
+  initFlag: boolean,
 }
 
 interface TCatalogResult {
@@ -30,8 +31,9 @@ const defaultCatalogParams: TCatalogParams = {
   priceTo: defaultPriceTo, 
   producers: [],
   categories: [],
-  updateResultFlag: false,
-  resetPageFlag: false,
+  updateResultFlag: false, //обновить результаты поиска?
+  resetPageFlag: false, //сбросить страницу на 1?
+  initFlag: false, //параметры пронициализированы?
 }
 
 const defaultCatalogResult: TCatalogResult = {
@@ -54,23 +56,37 @@ export function Catalog(props: TCatalogProps) {
     page = 1;
   }
 
+  let priceFr = parseInt(router.hashParams['priceFr']);
+  if (!isFinite(priceFr)) {
+    priceFr = defaultPriceFr;
+  }
+
+  let priceTo = parseInt(router.hashParams['priceTo']);
+  if (!isFinite(priceTo)) {
+    priceTo = defaultPriceTo;
+  }
+
   const [catalogParams, setCatalogParams] = React.useState(defaultCatalogParams);
   const [catalogResult, setCatalogResult] = React.useState(defaultCatalogResult);
 
   const updateCatalogResult = React.useCallback(async function () {
-    console.log('call updateCatalogResult');
+    
+    if (catalogParams.updateResultFlag && catalogParams.initFlag) {
+      console.log('call updateCatalogResult: ', JSON.stringify(catalogParams));    
 
-    if (catalogParams.updateResultFlag) {   
-
-      if (catalogParams.resetPageFlag && page !== 1) {
-        window.location.hash = '#!catalog?page=1';
-        return;
+      if (catalogParams.resetPageFlag) {
+        let hashQueryStr = catalogParamsHashQuery(catalogParams).toString();
+        window.location.hash = '#!catalog?' + hashQueryStr + '&page=1';
+        if (page !== 1) {
+          return;
+        }
       }
 
       const {products, totalPages} = await fetchProducts(catalogParams, page);
       setTimeout(() => {
         setCatalogParams(cp => mergeObj(cp, {
-          updateResultFlag: false
+          updateResultFlag: false,
+          resetPageFlag: false,
         }));
         setCatalogResult(cr => mergeObj(cr, {
           products: products,
@@ -82,6 +98,7 @@ export function Catalog(props: TCatalogProps) {
   
   async function initCatalogParams() {
     console.log('call initCatalog');
+
     // производитель
     const producersAll = await fetchProducers();
     const producers = producersAll.map(pr => mergeObj(pr, {checked: false}));
@@ -92,10 +109,13 @@ export function Catalog(props: TCatalogProps) {
 
     setCatalogParams(cp => { 
       return mergeObj(cp, {
+        priceFr: priceFr,
+        priceTo: priceTo,
         producers: producers,
         categories: categories,
         updateResultFlag: true,
         resetPageFlag: false,
+        initFlag: true,
       }
     )});
   }
@@ -116,6 +136,7 @@ export function Catalog(props: TCatalogProps) {
   }, [page]);
 
   document.title = 'Каталог [' + page + ']';
+  let hashStr = '#!catalog?' + catalogParamsHashQuery(catalogParams).toString();
 
   return (
     <div className='catalog'>
@@ -137,20 +158,18 @@ export function Catalog(props: TCatalogProps) {
               <div className='catalog__msg'>
                 <div><b>Загрузка...</b></div>
               </div> 
-            : 
-              <>
+            : <>
               <div className='catalog__products'>
                 { 
                   catalogResult.products.length > 0 ?
-                    catalogResult.products.map(product => (
-                      <ProductCard 
-                        key={product.id} 
-                        product={product} 
-                        basketControl={props.basketControl} 
-                      />
-                    )) 
-                  : 
-                    <b>Нет результатов</b>
+                  catalogResult.products.map(product => (
+                    <ProductCard 
+                      key={product.id} 
+                      product={product} 
+                      basketControl={props.basketControl} 
+                    />
+                  )) 
+                  : <b>Нет результатов</b>
                 }
               </div>
               <div className='catalog__products-pagination'>
@@ -158,7 +177,10 @@ export function Catalog(props: TCatalogProps) {
                   range(1, catalogResult.totalPages).map(i => (
                     <span key={i}>
                       { i > 1 ? ' | ' : '' }
-                      { i !== page ? <a href={'#!catalog?page='+(i)}>{i}</a> : <b>{i}</b> }
+                      { i !== page ? 
+                          <a href={hashStr + '&page=' + i}>{i}</a> 
+                        : <b>{i}</b>
+                      }
                     </span> 
                   ))
                 }
@@ -226,14 +248,11 @@ function FilterPrice(props: TFilterPriceProps) {
   const [catalogParams, setCatalogParams] = props.catalogParamsControl;
 
   // цена от
-  const [priceFr, setPriceFr] = React.useState(defaultPriceFr.toString());
-
   function priceFrOnChange(ev: React.FormEvent<HTMLInputElement>) {
     const priceStr = ev.currentTarget.value.trim();
     if (priceStr == '' || isIntStr(priceStr)) {
-      setPriceFr(priceStr);
       let price = parseInt(priceStr);
-      if (!isFinite(price)) { 
+      if (!isFinite(price)) {  
         price = defaultPriceFr;
       }
       setCatalogParams(fp => mergeObj(fp, {priceFr: price}));
@@ -241,12 +260,9 @@ function FilterPrice(props: TFilterPriceProps) {
   }
 
   // цена до
-  const [priceTo, setPriceTo] = React.useState(defaultPriceTo.toString());
-
   function priceToOnChange(ev: React.FormEvent<HTMLInputElement>) {
     const priceStr = ev.currentTarget.value.trim();
     if (priceStr == '' || isIntStr(priceStr)) {
-      setPriceTo(priceStr);
       let price = parseInt(priceStr);
       if (!isFinite(price)) { 
         price = defaultPriceTo;
@@ -257,10 +273,10 @@ function FilterPrice(props: TFilterPriceProps) {
 
   return (
     <>
-      <input type='text' value={priceFr} onChange={priceFrOnChange} 
+      <input type='text' value={catalogParams.priceFr} onChange={priceFrOnChange} 
         placeholder='От' style={{width: '5em'}} /> 
       {' – '}
-      <input type='text' value={priceTo} onChange={priceToOnChange} 
+      <input type='text' value={catalogParams.priceTo} onChange={priceToOnChange} 
         placeholder='До' style={{width: '5em'}}/>
     </>
   )
@@ -478,7 +494,15 @@ function HotCategories(props: THotCategoriesProps) {
   );
 }
 
-/**************************/
+// параметры фильтра в строку параметров
+function catalogParamsHashQuery(catalogParams: TCatalogParams) {
+  let query = new URLSearchParams();
+  query.append('priceFr', catalogParams.priceFr.toString());
+  query.append('priceTo', catalogParams.priceTo.toString());
+  return query;
+}
+
+/**********/
 
 // получение списка продкутов с "сервера"
 async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
@@ -545,7 +569,7 @@ async function fetchCategories() {
   return categories;
 }
 
-/**************************/
+/**********/
 
 // инициализация продуктов на "сервере"
 if( true || !localStorage.getItem('products') ) {
