@@ -1,7 +1,7 @@
 
 import React from 'react';
 import {useRouterControl} from './Router';
-import {TBasketControl, BasketActionType} from './Basket';
+import {TBasketControl, ProductBasketMenu} from './Basket';
 
 // продукт
 export interface TProduct {
@@ -28,61 +28,44 @@ export interface TCategory {
 }
 
 // карточка продукта 
-export interface TProductCardProps {
+export interface TCatalogProductCardProps {
   product: TProduct,
   basketControl: TBasketControl
 }
 
-export function ProductCard(props: TProductCardProps) {
+export function CatalogProductCard(props: TCatalogProductCardProps) {
 
-  const [basket, basketDispatch] = props.basketControl;
-
-  const count = basket.products
-    .find(pr => pr.id === props.product.id)?.count ?? 0;
-
-  function basketAdd() {
-    basketDispatch({type: BasketActionType.ADD, args: props.product});
-  }
-
-  function basketSub() {
-    basketDispatch({type: BasketActionType.SUB, args: props.product});
-  }
-
-  function basketDel() {
-    basketDispatch({type: BasketActionType.DEL, args: props.product});
-  }
+  const product = props.product;
 
   return (
-    <div className='product-card'>
-      <div className='product-card__content'>
-        <div className='product-card__title'>
-          <a href={`#!product?id=${props.product.id}`}>
-            {props.product.title}
+    <div className='catalog-product-card'>
+      <div className='catalog-product-card__content'>
+        <div className='catalog-product-card__title'>
+          <a href={`#!product?id=${product.id}`}>
+            {product.title}
           </a>
         </div>
-        <div className='product-card__description'>
-          {props.product.description}
+        <div className='catalog-product-card__description'>
+          {product.description}
         </div>
-        <div className='product-card__price'>
-          Цена: {props.product.price} ₽
+        <div className='catalog-product-card__price'>
+          Цена: {product.price} ₽
         </div>
-        <div className='product-card__categories'>
-          { 'Категории: ' + props.product.categories.join(', ') }
+        <div className='catalog-product-card__categories'>
+          'Категории: {product.categories.join(', ')}
         </div>
-        <div className='product-card__producer'>
-          Производитель: {props.product.producer}
+        <div className='catalog-product-card__producer'>
+          Производитель: {product.producer}
         </div>
-        <div className='product-card__code'>
-          Штрихкод: {props.product.code}
+        <div className='catalog-product-card__code'>
+          Штрихкод: {product.code}
         </div>
       </div>
-      <div className='product-card__menu'>
-        <div className='product-card__menu-info'>
-          {`В корзине ${count} шт на ${count*props.product.price} ₽`}
-        </div>
-        <button className='product-card__btn' onClick={basketAdd}>+</button>{' '}
-        <button className='product-card__btn' onClick={basketSub}>–</button>{' '}
-        <button className='product-card__btn' onClick={basketDel}>x</button>
+      <div className='catalog-product-card__menu'>
+        <ProductBasketMenu 
+            product={product}
+            basketControl={props.basketControl} 
+        />
       </div>
     </div>
   );
@@ -95,7 +78,7 @@ export interface TProductPageProps {
 
 export function ProductPage(props: TProductPageProps) {
 
-  const [router, setRouter] = useRouterControl();
+  const [router, ] = useRouterControl();
 
   let productId = parseInt(router.hashParams['id']);
   if (!isFinite(productId)) {
@@ -169,42 +152,48 @@ export function ProductPage(props: TProductPageProps) {
   );
 }
 
-// корзинное меню продукта
-export interface TProductBasketMenuProps {
+// карточка продукта в корзине
+export interface TBasketProductCardProps {
   product: TProduct,
   basketControl: TBasketControl
 }
 
-export function ProductBasketMenu(props: TProductBasketMenuProps) {
+export function BasketProductCard(props: TBasketProductCardProps) {
 
   const product = props.product;
-  const [basket, basketDispatch] = props.basketControl;
-
-  const count = basket.products
-    .find(pr => pr.id === product.id)?.count ?? 0;
-
-  function basketAdd() {
-    basketDispatch({type: BasketActionType.ADD, args: product});
-  }
-
-  function basketSub() {
-    basketDispatch({type: BasketActionType.SUB, args: product});
-  }
-
-  function basketDel() {
-    basketDispatch({type: BasketActionType.DEL, args: product});
-  }
 
   return (
-    <div className='product-basket-menu'>
-      <div className='product-basket-menu__info'>
-        {`В корзине ${count} шт на ${count*product.price} ₽`}
+    <div className='basket-product-card'>
+      <div className='basket-product-card__content'>
+        <div className='basket-product-card__title'>
+          <a href={`#!product?id=${product.id}`}>
+            {product.title}
+          </a>
+        </div>
+        <div className='basket-product-card__description'>
+          {product.description}
+        </div>
+        <div className='basket-product-card__price'>
+          Цена: {product.price} ₽
+        </div>
+        <div className='basket-product-card__categories'>
+          'Категории: {product.categories.join(', ')}
+        </div>
+        <div className='basket-product-card__producer'>
+          Производитель: {product.producer}
+        </div>
+        <div className='basket-product-card__code'>
+          Штрихкод: {product.code}
+        </div>
       </div>
-      <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
-      <button className='product-basket-menu__btn' onClick={basketSub}>–</button>{' '}
-      <button className='product-basket-menu__btn' onClick={basketDel}>x</button>
+      <div className='basket-product-card__menu'>
+        <ProductBasketMenu 
+          product={product}
+          basketControl={props.basketControl} 
+        />
+      </div>
     </div>
-  )
+  );
 }
 
 // получение продукта

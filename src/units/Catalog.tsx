@@ -3,7 +3,7 @@ import React from 'react';
 import {isIntStr, mergeObj, addObj, range} from './utils';
 import {useRouterControl} from './Router';
 import {TBasketControl} from './Basket';
-import {TProduct, TProducer, TCategory, ProductCard} from './Product';
+import {TProduct, TProducer, TCategory, CatalogProductCard} from './Product';
 import {initProducts} from '../data/products';
 import {initProducers} from '../data/producers';
 import {initCategories} from '../data/categories';
@@ -177,7 +177,7 @@ export function Catalog(props: TCatalogProps) {
                 { 
                   catalogResult.products.length > 0 ?
                   catalogResult.products.map(product => (
-                    <ProductCard 
+                    <CatalogProductCard 
                       key={product.id} 
                       product={product} 
                       basketControl={props.basketControl} 
