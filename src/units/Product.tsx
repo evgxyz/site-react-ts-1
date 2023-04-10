@@ -102,8 +102,6 @@ export function ProductPage(props: TProductPageProps) {
     productId = 0;
   }
 
-  const [basket, basketDispatch] = props.basketControl;
-
   const [product, setProduct] = React.useState({} as TProduct);
 
   async function getProduct() {
@@ -137,21 +135,6 @@ export function ProductPage(props: TProductPageProps) {
     )
   }
 
-  const count = basket.products
-    .find(pr => pr.id === productId)?.count ?? 0;
-
-  function basketAdd() {
-    basketDispatch({type: BasketActionType.ADD, args: product});
-  }
-
-  function basketSub() {
-    basketDispatch({type: BasketActionType.SUB, args: product});
-  }
-
-  function basketDel() {
-    basketDispatch({type: BasketActionType.DEL, args: product});
-  }
-
   document.title = product.title;
 
   return (
@@ -167,7 +150,7 @@ export function ProductPage(props: TProductPageProps) {
           Цена: {product.price} ₽
         </div>
         <div className='product-page__categories'>
-          {'Категории: ' + product.categories.join(', ')}
+          Категории: {product.categories.join(', ')}
         </div>
         <div className='product-page__producer'>
           Производитель: {product.producer}
@@ -177,15 +160,51 @@ export function ProductPage(props: TProductPageProps) {
         </div>
       </div>
       <div className='product-page__menu'>
-        <div className='product-page__menu-info'>
-          {`В корзине ${count} шт на ${count*product.price} ₽`}
-        </div>
-        <button className='product-page__btn' onClick={basketAdd}>+</button>{' '}
-        <button className='product-page__btn' onClick={basketSub}>–</button>{' '}
-        <button className='product-page__btn' onClick={basketDel}>x</button>
+        <ProductBasketMenu 
+          product={product}
+          basketControl={props.basketControl} 
+        />
       </div>
     </div>
   );
+}
+
+// корзинное меню продукта
+export interface TProductBasketMenuProps {
+  product: TProduct,
+  basketControl: TBasketControl
+}
+
+export function ProductBasketMenu(props: TProductBasketMenuProps) {
+
+  const product = props.product;
+  const [basket, basketDispatch] = props.basketControl;
+
+  const count = basket.products
+    .find(pr => pr.id === product.id)?.count ?? 0;
+
+  function basketAdd() {
+    basketDispatch({type: BasketActionType.ADD, args: product});
+  }
+
+  function basketSub() {
+    basketDispatch({type: BasketActionType.SUB, args: product});
+  }
+
+  function basketDel() {
+    basketDispatch({type: BasketActionType.DEL, args: product});
+  }
+
+  return (
+    <div className='product-basket-menu'>
+      <div className='product-basket-menu__info'>
+        {`В корзине ${count} шт на ${count*product.price} ₽`}
+      </div>
+      <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
+      <button className='product-basket-menu__btn' onClick={basketSub}>–</button>{' '}
+      <button className='product-basket-menu__btn' onClick={basketDel}>x</button>
+    </div>
+  )
 }
 
 // получение продукта
