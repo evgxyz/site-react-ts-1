@@ -234,7 +234,8 @@ export function BasketItemMenu(props: TBasketItemMenuProps) {
         {`${count} шт на ${count * product.price} ₽`}
       </div>
       <div className='basket-item-menu__btns'>
-        <button className='basket-item-menu__btn' onClick={basketSub}>–</button>{' '}
+        <button className='basket-item-menu__btn' onClick={basketSub}>–</button>
+        {/* <input type='text' className='basket-item-menu__count'></input> */}
         <button className='basket-item-menu__btn' onClick={basketAdd}>+</button>{' '}
         <button className='basket-item-menu__btn' onClick={basketDel}>x</button>
       </div>
@@ -273,8 +274,8 @@ export function ProductBasketMenu(props: TProductBasketMenuProps) {
       <div className='product-basket-menu__info'>
         {`${count} шт на ${count * product.price} ₽`}
       </div>
-      <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
       <button className='product-basket-menu__btn' onClick={basketSub}>–</button>{' '}
+      <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
       <button className='product-basket-menu__btn' onClick={basketDel}>x</button>
     </div>
   )

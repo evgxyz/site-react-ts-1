@@ -268,7 +268,14 @@
   flex-direction: column;
   justify-content: space-between;
 
+  &__count {
+    width: 3em;
+    height: 1.6em;
+    vertical-align: middle;
+  }
+
   &__btn {
+    vertical-align: middle;
     font-size: large; 
     font-weight: bold;
   }

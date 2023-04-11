@@ -218,7 +218,13 @@
   flex-direction: column;
   justify-content: space-between;
 }
+.basket-item-menu__count {
+  width: 3em;
+  height: 1.6em;
+  vertical-align: middle;
+}
 .basket-item-menu__btn {
+  vertical-align: middle;
   font-size: large;
   font-weight: bold;
 }
