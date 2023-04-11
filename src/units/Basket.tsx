@@ -231,7 +231,7 @@ export function BasketItemMenu(props: TBasketItemMenuProps) {
   return (
     <div className='basket-item-menu'>
       <div className='basket-item-menu__info'>
-        {`${count} шт на ${count * product.price} ₽`}
+        {`${count} шт на ${count*product.price} ₽`}
       </div>
       <div className='basket-item-menu__btns'>
         <button className='basket-item-menu__btn' onClick={basketAdd}>+</button>{' '}
@@ -271,7 +271,7 @@ export function ProductBasketMenu(props: TProductBasketMenuProps) {
   return (
     <div className='product-basket-menu'>
       <div className='product-basket-menu__info'>
-        {`${count} шт на ${count * product.price} ₽`}
+        {`${count} шт на ${count*product.price} ₽`}
       </div>
       <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
       <button className='product-basket-menu__btn' onClick={basketSub}>–</button>{' '}

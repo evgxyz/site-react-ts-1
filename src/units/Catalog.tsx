@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {isIntStr, mergeObj, addObj, range} from './utils';
+import {isIntStr, mergeObj, addObj, range, compare} from './utils';
 import {useRouterControl} from './Router';
 import {TBasketControl} from './Basket';
 import {TProduct, TProducer, TCategory, CatalogProductCard} from './Product';
@@ -8,11 +8,19 @@ import {initProducts} from '../data/products';
 import {initProducers} from '../data/producers';
 import {initCategories} from '../data/categories';
 
+enum CatalogSortType {
+  PRICE = 'price',
+  PRICE_DESC = 'price_DESC',
+  TITLE = 'title',
+  TITLE_DESC = 'title_DESC'
+}
+
 interface TCatalogParams {
   priceFr: number,
   priceTo: number,
   producers: (TProducer & {checked: boolean})[],
   categories: (TCategory & {checked: boolean})[],
+  sort: CatalogSortType,
   updateResultFlag: boolean,
   resetPageFlag: boolean,
   initFlag: boolean,
@@ -25,12 +33,14 @@ interface TCatalogResult {
 
 const defaultPriceFr = 0;
 const defaultPriceTo = 10000;
+const defaultSort = CatalogSortType.PRICE;
 
 const defaultCatalogParams: TCatalogParams = {
   priceFr: defaultPriceFr, 
   priceTo: defaultPriceTo, 
   producers: [],
   categories: [],
+  sort: defaultSort,
   updateResultFlag: false, //обновить результаты поиска?
   resetPageFlag: false, //сбросить страницу на 1?
   initFlag: false, //параметры пронициализированы?
@@ -75,6 +85,12 @@ export function Catalog(props: TCatalogProps) {
   // категории
   let categoryIds = (router.hashParams['categoryIds'] ?? '')
     .split('_').map(s => parseInt(s)).filter(id => isFinite(id));
+
+  // сортировка
+  let sort = (router.hashParams['sort'] ?? '')
+  if (!(Object.values(CatalogSortType) as string[]).includes(sort)) {
+    sort = defaultSort;
+  }
 
   const [catalogParams, setCatalogParams] = React.useState(defaultCatalogParams);
   const [catalogResult, setCatalogResult] = React.useState(defaultCatalogResult);
@@ -127,6 +143,7 @@ export function Catalog(props: TCatalogProps) {
         priceTo: priceTo,
         producers: producers,
         categories: categories,
+        sort: sort,
         updateResultFlag: true,
         resetPageFlag: false,
         initFlag: true,
@@ -541,6 +558,11 @@ function catalogParamsHashQuery(catalogParams: TCatalogParams) {
     query.append('categoryIds', categoryIdsStr);
   }
 
+  // сортировка
+  if (catalogParams.sort !== defaultSort) {
+    query.append('sort', catalogParams.sort);
+  }
+
   return query;
 }
 
@@ -561,7 +583,29 @@ async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
     .filter(ct => ct.checked)
     .map(ct => ct.title);
 
-  const productsAll: TProduct[] = JSON.parse(String(localStorage.getItem('products'))) ?? [];
+  // функция для сортировки результатов
+  let sortCompareFn: (prX: TProduct, prY: TProduct) => number;
+  switch (catalogParams.sort) {
+    case CatalogSortType.PRICE: {
+      sortCompareFn = 
+        (prX: TProduct, prY: TProduct) => compare(prX.price, prY.price);
+    } break;
+    case CatalogSortType.PRICE_DESC: {
+      sortCompareFn = 
+        (prX: TProduct, prY: TProduct) => -compare(prX.price, prY.price);
+    } break;
+    case CatalogSortType.TITLE: {
+      sortCompareFn = 
+        (prX: TProduct, prY: TProduct) => compare(prX.title, prY.title);
+    } break;
+    case CatalogSortType.TITLE_DESC: {
+      sortCompareFn = 
+        (prX: TProduct, prY: TProduct) => -compare(prX.title, prY.title);
+    } break;
+  }
+
+  const productsAll: TProduct[] = 
+    JSON.parse(String(localStorage.getItem('products'))) ?? [];
   const products = productsAll.filter(product => {
       return (
         // цена
@@ -578,7 +622,9 @@ async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
             return false;
           })() )
       );
-    });
+    })
+    .sort(sortCompareFn); // сортировка результатов
+  
   const indexFrom = perPage*(page - 1);
   const indexTo = indexFrom + perPage;
   return {
@@ -597,7 +643,7 @@ async function fetchProducers(query: string = '') {
     x.title.toLowerCase().includes(query.toLowerCase())
   )
   .sort(
-    (x, y) => (x.title === y.title ? 0 : x.title > y.title ? 1 : -1)
+    (x, y) => (x.title === y.title ? 0 : x.title > y.title ? 1 : -1) 
   );
   return producers;
 }
