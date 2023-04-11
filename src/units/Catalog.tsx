@@ -197,17 +197,17 @@ export function Catalog(props: TCatalogProps) {
           />
         </div>
         <div className='catalog__result'>
-          {
-            catalogParams.updateResultFlag ? 
+            <div className='catalog__sort'>
+              <CatalogSort 
+                catalogParamsControl={[catalogParams, setCatalogParams]} 
+              />
+            </div>
+            { 
+              catalogParams.updateResultFlag ? 
               <div className='catalog__msg'>
                 <div><b>Загрузка...</b></div>
               </div> 
             : <>
-              <div className='catalog__sort'>
-                <CatalogSort 
-                  catalogParamsControl={[catalogParams, setCatalogParams]} 
-                />
-              </div>
               <div className='catalog__products'>
                 { 
                   catalogResult.products.length > 0 ?
@@ -506,24 +506,24 @@ function HotCategories(props: THotCategoriesProps) {
   
   return (
     <>
-      <ul className='hot-categories-list'>
-        { 
-          catalogParams.categories.map(category => {
-              return (
-                <li key={category.id}>
-                  <label>
-                    <input type='checkbox' 
-                      checked={category.checked} 
-                      onChange={() => {categoryOnChange(category.id)}}
-                    />
-                    {category.title}
-                  </label>
-                </li>
-              );
-            }
-          )
-        }
-      </ul>
+    <ul className='hot-categories-list'>
+      { 
+        catalogParams.categories.map(category => {
+            return (
+              <li key={category.id}>
+                <label>
+                  <input type='checkbox' 
+                    checked={category.checked} 
+                    onChange={() => {categoryOnChange(category.id)}}
+                  />
+                  {category.title}
+                </label>
+              </li>
+            );
+          }
+        )
+      }
+    </ul>
     </>
   );
 }
@@ -549,6 +549,8 @@ function CatalogSort(props: TCatalogSortProps) {
   }
 
   return (
+    <>
+    {'Сортировать: '}
     <select value={catalogParams.sort} onChange={sortOnChange}>
       {
         sortTypes.map(st => 
@@ -556,6 +558,7 @@ function CatalogSort(props: TCatalogSortProps) {
         )
       }
     </select>
+    </>
   );
 }
 
