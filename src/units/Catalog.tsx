@@ -35,10 +35,10 @@ const sortTypes: string[] = [
 ]; 
 
 const sortTypeTexts: {[sortType: string]: string} = {
-  price: 'По цене ↓',
-  price_DESC: 'По цене ↑',
-  title: 'По названию ↓',
-  title_DESC: 'По названию ↑',
+  price: 'По цене ↑',
+  price_DESC: 'По цене ↓',
+  title: 'По названию ↑',
+  title_DESC: 'По названию ↓',
 };
 
 const defaultPriceFr = 0;
@@ -177,9 +177,9 @@ export function Catalog(props: TCatalogProps) {
     }));
   }, [page]);
 
-  document.title = 'Каталог [' + page + ']';
+  document.title = `Каталог [${page}]`;
   let hashQueryStr = catalogParamsHashQuery(catalogParams).toString();
-  let hashStr = '#!catalog' + (hashQueryStr !== '' ? '&' + hashQueryStr : '?');
+  let hashStr = '#!catalog' + (hashQueryStr !== '' ? `?${hashQueryStr}&` : '?');
 
   return (
     <div className='catalog'>
@@ -290,10 +290,19 @@ function FilterPrice(props: TFilterPriceProps) {
 
   const [catalogParams, setCatalogParams] = props.catalogParamsControl;
 
+  const [priceFr, setPriceFr] = React.useState('');
+  const [priceTo, setPriceTo] = React.useState('');
+
+  React.useEffect(() => {
+    setPriceFr(catalogParams.priceFr.toString());
+    setPriceTo(catalogParams.priceTo.toString());
+  }, []);
+
   // цена от
-  function priceFrOnChange(ev: React.FormEvent<HTMLInputElement>) {
+  function priceFrOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
     const priceStr = ev.currentTarget.value.trim();
     if (priceStr == '' || isIntStr(priceStr)) {
+      setPriceFr(priceStr);
       let price = parseInt(priceStr);
       if (!isFinite(price)) {  
         price = defaultPriceFr;
@@ -303,9 +312,10 @@ function FilterPrice(props: TFilterPriceProps) {
   }
 
   // цена до
-  function priceToOnChange(ev: React.FormEvent<HTMLInputElement>) {
+  function priceToOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
     const priceStr = ev.currentTarget.value.trim();
     if (priceStr == '' || isIntStr(priceStr)) {
+      setPriceTo(priceStr);
       let price = parseInt(priceStr);
       if (!isFinite(price)) { 
         price = defaultPriceTo;
@@ -316,11 +326,11 @@ function FilterPrice(props: TFilterPriceProps) {
 
   return (
     <>
-      <input type='text' value={catalogParams.priceFr} onChange={priceFrOnChange} 
-        placeholder='От' style={{width: '5em'}} /> 
-      {' – '}
-      <input type='text' value={catalogParams.priceTo} onChange={priceToOnChange} 
-        placeholder='До' style={{width: '5em'}}/>
+    <input type='text' value={priceFr} onChange={priceFrOnChange} 
+      placeholder='От' style={{width: '5em'}} /> 
+    {' – '}
+    <input type='text' value={priceTo} onChange={priceToOnChange} 
+      placeholder='До' style={{width: '5em'}}/>
     </>
   )
 }
@@ -349,7 +359,7 @@ function FilterProducers(props: TFilterProducersProps) {
   React.useEffect(() => {updateProducerIds()}, [queryProducers]);
 
   // обработчик поля поиска
-  function queryProducersOnChange(ev: React.FormEvent<HTMLInputElement>) {
+  function queryProducersOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
     setQueryProducers(ev.currentTarget.value);
   }
 

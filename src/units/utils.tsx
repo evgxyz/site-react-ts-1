@@ -13,12 +13,7 @@ export function range(from: number, to: number, step: number = 1) {
 
 export function compare<T>(x: T, y: T) {
   if (x === y) return 0;
-  if (typeof(x) === 'string') {
-    return (x > y) ? 1 : -1;
-  } 
-  else {
-    return (x < y) ? 1 : -1;
-  }
+  return (x < y) ? -1 : 1;
 }
 
 export function mergeObj<T extends object, T2 extends object>(obj: T, addObj: T2) {
