@@ -27,50 +27,6 @@ export interface TCategory {
   rate: number,
 }
 
-// карточка продукта 
-export interface TCatalogProductCardProps {
-  product: TProduct,
-  basketControl: TBasketControl
-}
-
-export function CatalogProductCard(props: TCatalogProductCardProps) {
-
-  const product = props.product;
-
-  return (
-    <div className='catalog-product-card'>
-      <div className='catalog-product-card__content'>
-        <div className='catalog-product-card__title'>
-          <a href={`#!product?id=${product.id}`}>
-            {product.title}
-          </a>
-        </div>
-        <div className='catalog-product-card__description'>
-          {product.description}
-        </div>
-        <div className='catalog-product-card__price'>
-          Цена: {product.price} ₽
-        </div>
-        <div className='catalog-product-card__categories'>
-          'Категории: {product.categories.join(', ')}
-        </div>
-        <div className='catalog-product-card__producer'>
-          Производитель: {product.producer}
-        </div>
-        <div className='catalog-product-card__code'>
-          Штрихкод: {product.code}
-        </div>
-      </div>
-      <div className='catalog-product-card__menu'>
-        <ProductBasketMenu 
-            product={product}
-            basketControl={props.basketControl} 
-        />
-      </div>
-    </div>
-  );
-}
-
 // страница продукта 
 export interface TProductPageProps {
   basketControl: TBasketControl
@@ -152,41 +108,41 @@ export function ProductPage(props: TProductPageProps) {
   );
 }
 
-// карточка продукта в корзине
-export interface TBasketProductCardProps {
+// карточка продукта в каталоге
+export interface TProductCardProps {
   product: TProduct,
   basketControl: TBasketControl
 }
 
-export function BasketProductCard(props: TBasketProductCardProps) {
+export function CatalogProductCard(props: TProductCardProps) {
 
   const product = props.product;
 
   return (
-    <div className='basket-product-card'>
-      <div className='basket-product-card__content'>
-        <div className='basket-product-card__title'>
+    <div className='catalog-product-card'>
+      <div className='catalog-product-card__content'>
+        <div className='catalog-product-card__title'>
           <a href={`#!product?id=${product.id}`}>
             {product.title}
           </a>
         </div>
-        <div className='basket-product-card__description'>
+        <div className='catalog-product-card__description'>
           {product.description}
         </div>
-        <div className='basket-product-card__price'>
+        <div className='catalog-product-card__price'>
           Цена: {product.price} ₽
         </div>
-        <div className='basket-product-card__categories'>
-          'Категории: {product.categories.join(', ')}
+        <div className='catalog-product-card__categories'>
+          Категории: {product.categories.join(', ')}
         </div>
-        <div className='basket-product-card__producer'>
+        <div className='catalog-product-card__producer'>
           Производитель: {product.producer}
         </div>
-        <div className='basket-product-card__code'>
+        <div className='catalog-product-card__code'>
           Штрихкод: {product.code}
         </div>
       </div>
-      <div className='basket-product-card__menu'>
+      <div className='catalog-product-card__menu'>
         <ProductBasketMenu 
           product={product}
           basketControl={props.basketControl} 

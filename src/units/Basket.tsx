@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {TProduct, BasketProductCard} from './Product';
+import {TProduct} from './Product';
 
 export type TBasketProduct = TProduct & {count: number};
 
@@ -149,10 +149,10 @@ export function Basket(props: TBasketProps) {
   return (
     <div className='basket'>
       <h1>Корзина</h1>
-      <div className='basket-products-list'>
+      <div className='basket-item-list'>
         {
           basket.products.map(product => (
-            <BasketProductCard 
+            <BasketItem 
               key={product.id} 
               product={product} 
               basketControl={props.basketControl} 
@@ -162,6 +162,84 @@ export function Basket(props: TBasketProps) {
       </div>
     </div>
   );
+}
+
+// карточка продукта в корзине
+export interface TBasketItemProps {
+  product: TProduct,
+  basketControl: TBasketControl
+}
+
+export function BasketItem(props: TBasketItemProps) {
+
+  const product = props.product;
+
+  return (
+    <div className='basket-item'>
+      <div className='basket-item__content'>
+        <div className='basket-item__title'>
+          <a href={`#!product?id=${product.id}`}>
+            {product.title}
+          </a>
+        </div>
+        <div className='basket-item__price'>
+          Цена: {product.price} ₽
+        </div>
+        <div className='basket-item__producer'>
+          Производитель: {product.producer}
+        </div>
+        <div className='basket-item__code'>
+          Штрихкод: {product.code}
+        </div>
+      </div>
+      <div className='basket-item__menu'>
+        <BasketItemMenu 
+          product={product}
+          basketControl={props.basketControl} 
+        />
+      </div>
+    </div>
+  );
+}
+
+// корзинное меню продукта
+export interface TBasketItemMenuProps {
+  product: TProduct,
+  basketControl: TBasketControl
+}
+
+export function BasketItemMenu(props: TBasketItemMenuProps) {
+
+  const product = props.product;
+  const [basket, basketDispatch] = props.basketControl;
+
+  const count = basket.products
+    .find(pr => pr.id === product.id)?.count ?? 0;
+
+  function basketAdd() {
+    basketDispatch({type: BasketActionType.ADD, args: product});
+  }
+
+  function basketSub() {
+    basketDispatch({type: BasketActionType.SUB, args: product});
+  }
+
+  function basketDel() {
+    basketDispatch({type: BasketActionType.DEL, args: product});
+  }
+
+  return (
+    <div className='basket-item-menu'>
+      <div className='basket-item-menu__info'>
+        {`${count} шт на ${count * product.price} ₽`}
+      </div>
+      <div className='basket-item-menu__btns'>
+        <button className='basket-item-menu__btn' onClick={basketSub}>–</button>{' '}
+        <button className='basket-item-menu__btn' onClick={basketAdd}>+</button>{' '}
+        <button className='basket-item-menu__btn' onClick={basketDel}>x</button>
+      </div>
+    </div>
+  )
 }
 
 // корзинное меню продукта
@@ -193,7 +271,7 @@ export function ProductBasketMenu(props: TProductBasketMenuProps) {
   return (
     <div className='product-basket-menu'>
       <div className='product-basket-menu__info'>
-        {`В корзине ${count} шт на ${count*product.price} ₽`}
+        {`${count} шт на ${count * product.price} ₽`}
       </div>
       <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
       <button className='product-basket-menu__btn' onClick={basketSub}>–</button>{' '}
