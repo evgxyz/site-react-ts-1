@@ -1,6 +1,7 @@
 
 import React from 'react';
 import {isIntStr, mergeObj, addObj, range, compare} from './utils';
+import {TStateControl} from './stateControl'
 import {useRouterControl} from './Router';
 import {TBasketControl} from './Basket';
 import {TProduct, TProducer, TCategory, CatalogProductCard} from './Product';
@@ -8,19 +9,12 @@ import {initProducts} from '../data/products';
 import {initProducers} from '../data/producers';
 import {initCategories} from '../data/categories';
 
-enum CatalogSortType {
-  PRICE = 'price',
-  PRICE_DESC = 'price_DESC',
-  TITLE = 'title',
-  TITLE_DESC = 'title_DESC'
-}
-
 interface TCatalogParams {
   priceFr: number,
   priceTo: number,
   producers: (TProducer & {checked: boolean})[],
   categories: (TCategory & {checked: boolean})[],
-  sort: CatalogSortType,
+  sort: string,
   updateResultFlag: boolean,
   resetPageFlag: boolean,
   initFlag: boolean,
@@ -31,9 +25,25 @@ interface TCatalogResult {
   totalPages: number,
 }
 
+type TCatalogParamsControl = TStateControl<TCatalogParams>;
+
+const sortTypes: string[] = [
+  'price',
+  'price_DESC',
+  'title',
+  'title_DESC',
+]; 
+
+const sortTypeTexts: {[sortType: string]: string} = {
+  price: 'По цене ↓',
+  price_DESC: 'По цене ↑',
+  title: 'По названию ↓',
+  title_DESC: 'По названию ↑',
+};
+
 const defaultPriceFr = 0;
 const defaultPriceTo = 10000;
-const defaultSort = CatalogSortType.PRICE;
+const defaultSort = 'price';
 
 const defaultCatalogParams: TCatalogParams = {
   priceFr: defaultPriceFr, 
@@ -88,7 +98,7 @@ export function Catalog(props: TCatalogProps) {
 
   // сортировка
   let sort = (router.hashParams['sort'] ?? '')
-  if (!(Object.values(CatalogSortType) as string[]).includes(sort)) {
+  if (!sortTypes.includes(sort)) {
     sort = defaultSort;
   }
 
@@ -101,8 +111,9 @@ export function Catalog(props: TCatalogProps) {
       console.log('call updateCatalogResult: ', JSON.stringify(catalogParams));    
 
       if (catalogParams.resetPageFlag) {
-        let hashQueryStr = catalogParamsHashQuery(catalogParams).toString();
-        window.location.hash = '#!catalog?' + hashQueryStr + '&page=1';
+        const hashQuery = catalogParamsHashQuery(catalogParams);
+        hashQuery.append('page', '1');
+        window.location.hash = '#!catalog?' + hashQuery.toString();
         if (page !== 1) {
           return;
         }
@@ -167,11 +178,13 @@ export function Catalog(props: TCatalogProps) {
   }, [page]);
 
   document.title = 'Каталог [' + page + ']';
-  let hashStr = '#!catalog?' + catalogParamsHashQuery(catalogParams).toString();
+  let hashQueryStr = catalogParamsHashQuery(catalogParams).toString();
+  let hashStr = '#!catalog' + (hashQueryStr !== '' ? '&' + hashQueryStr : '?');
 
   return (
     <div className='catalog'>
       <h1>Каталог</h1>
+      {/* <pre>{JSON.stringify(catalogParams)}</pre> */}
       <div className='catalog__hot-categories'>
         <HotCategories 
           catalogParamsControl={[catalogParams, setCatalogParams]}
@@ -190,6 +203,11 @@ export function Catalog(props: TCatalogProps) {
                 <div><b>Загрузка...</b></div>
               </div> 
             : <>
+              <div className='catalog__sort'>
+                <CatalogSort 
+                  catalogParamsControl={[catalogParams, setCatalogParams]} 
+                />
+              </div>
               <div className='catalog__products'>
                 { 
                   catalogResult.products.length > 0 ?
@@ -209,7 +227,7 @@ export function Catalog(props: TCatalogProps) {
                     <span key={i}>
                       { i > 1 ? ' | ' : '' }
                       { i !== page ? 
-                          <a href={hashStr + '&page=' + i}>{i}</a> 
+                          <a href={hashStr + 'page=' + i}>{i}</a> 
                         : <b>{i}</b>
                       }
                     </span> 
@@ -227,10 +245,7 @@ export function Catalog(props: TCatalogProps) {
 /**************************/
 // фильтр основной
 interface TFilterProps {
-  catalogParamsControl: [
-    TCatalogParams, 
-    React.Dispatch<React.SetStateAction<TCatalogParams>>
-  ]
+  catalogParamsControl: TCatalogParamsControl
 }
 
 function Filter(props: TFilterProps) {
@@ -268,10 +283,7 @@ function Filter(props: TFilterProps) {
 /**************************/
 // подфильтр по цене
 interface TFilterPriceProps {
-  catalogParamsControl: [
-    TCatalogParams, 
-    React.Dispatch<React.SetStateAction<TCatalogParams>>
-  ]
+  catalogParamsControl: TCatalogParamsControl
 }
 
 function FilterPrice(props: TFilterPriceProps) {
@@ -316,10 +328,7 @@ function FilterPrice(props: TFilterPriceProps) {
 /**************************/
 // подфильтр по производителю
 interface TFilterProducersProps {
-  catalogParamsControl: [
-    TCatalogParams, 
-    React.Dispatch<React.SetStateAction<TCatalogParams>>
-  ]
+  catalogParamsControl: TCatalogParamsControl
 }
 
 function FilterProducers(props: TFilterProducersProps) {
@@ -364,7 +373,7 @@ function FilterProducers(props: TFilterProducersProps) {
     .filter(pr => (pr.checked || producerIds.includes(pr.id)));
 
   producersList.sort(
-    (x, y) => (x.checked === y.checked ? 0 : x.checked < y.checked ? 1 : -1)
+    (x, y) => compare(x.checked, y.checked)
   );
   
   if (!expanded) {
@@ -408,10 +417,7 @@ function FilterProducers(props: TFilterProducersProps) {
 /**************************/
 // подфильтр по категориям
 interface TFilterCategoriesProps {
-  catalogParamsControl: [
-    TCatalogParams, 
-    React.Dispatch<React.SetStateAction<TCatalogParams>>
-  ]
+  catalogParamsControl: TCatalogParamsControl
 }
 
 function FilterCategories(props: TFilterCategoriesProps) {
@@ -438,7 +444,7 @@ function FilterCategories(props: TFilterCategoriesProps) {
   
   if (!expanded) {
     cateroriesList.sort(
-      (x, y) => (x.checked == y.checked ? 0 : x.checked < y.checked ? 1 : -1)
+      (x, y) => compare(x.checked, y.checked)
     );
     
     const maxLen = 3;
@@ -474,13 +480,10 @@ function FilterCategories(props: TFilterCategoriesProps) {
   );
 }
 
-// /**************************/
-// // подфильтр по категориям
+/**************************/
+// подфильтр по категориям
 interface THotCategoriesProps {
-  catalogParamsControl: [
-    TCatalogParams, 
-    React.Dispatch<React.SetStateAction<TCatalogParams>>
-  ]
+  catalogParamsControl: TCatalogParamsControl
 }
 
 function HotCategories(props: THotCategoriesProps) {
@@ -522,6 +525,37 @@ function HotCategories(props: THotCategoriesProps) {
         }
       </ul>
     </>
+  );
+}
+
+// блок выбора сортировки 
+interface TCatalogSortProps {
+  catalogParamsControl: TCatalogParamsControl
+}
+
+function CatalogSort(props: TCatalogSortProps) {
+
+  const [catalogParams, setCatalogParams] = props.catalogParamsControl;
+
+  function sortOnChange(ev: React.ChangeEvent<HTMLSelectElement>) {
+    ev.preventDefault();
+    if (ev.target.value) {
+      setCatalogParams(cp => ({...cp, 
+        sort: ev.target.value,
+        updateResultFlag: true,
+        resetPageFlag: true
+      }));
+    }
+  }
+
+  return (
+    <select value={catalogParams.sort} onChange={sortOnChange}>
+      {
+        sortTypes.map(st => 
+          <option key={st} value={st}>{sortTypeTexts[st]}</option>
+        )
+      }
+    </select>
   );
 }
 
@@ -586,21 +620,26 @@ async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
   // функция для сортировки результатов
   let sortCompareFn: (prX: TProduct, prY: TProduct) => number;
   switch (catalogParams.sort) {
-    case CatalogSortType.PRICE: {
-      sortCompareFn = 
-        (prX: TProduct, prY: TProduct) => compare(prX.price, prY.price);
-    } break;
-    case CatalogSortType.PRICE_DESC: {
+
+    case 'price_DESC': {
       sortCompareFn = 
         (prX: TProduct, prY: TProduct) => -compare(prX.price, prY.price);
     } break;
-    case CatalogSortType.TITLE: {
+
+    case 'title': {
       sortCompareFn = 
         (prX: TProduct, prY: TProduct) => compare(prX.title, prY.title);
     } break;
-    case CatalogSortType.TITLE_DESC: {
+
+    case 'title_DESC': {
       sortCompareFn = 
         (prX: TProduct, prY: TProduct) => -compare(prX.title, prY.title);
+    } break;
+
+    //'price'
+    default: {
+      sortCompareFn = 
+        (prX: TProduct, prY: TProduct) => compare(prX.price, prY.price);
     } break;
   }
 
@@ -643,7 +682,7 @@ async function fetchProducers(query: string = '') {
     x.title.toLowerCase().includes(query.toLowerCase())
   )
   .sort(
-    (x, y) => (x.title === y.title ? 0 : x.title > y.title ? 1 : -1) 
+    (x, y) => compare(x.title, y.title) 
   );
   return producers;
 }
@@ -654,7 +693,7 @@ async function fetchCategories() {
   const categoriesAll: TCategory[] = 
     (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
   const categories = categoriesAll.sort(
-    (x, y) => (x.title === y.title ? 0 : x.title > y.title ? 1 : -1)
+    (x, y) => compare(x.title, y.title) 
   );
   return categories;
 }

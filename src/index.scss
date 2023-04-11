@@ -85,6 +85,12 @@
     //@include debug-border(blue);  
   }
 
+  &__sort {
+    padding: 10px;
+    padding-bottom: 0;
+    //@include debug-border(green); 
+  }
+
   &__products {
     display: flex;
     flex-grow: 1;

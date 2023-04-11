@@ -53,8 +53,7 @@ export function initRouter(routerControl: TRouterControl) {
   const [ , setRouter] = routerControl;
 
   const [initHashHead, initHashParams] = parseHash(window.location.hash);
-  setRouter(router => ({
-    ...router, 
+  setRouter(router => ({...router, 
     hashHead: initHashHead,
     hashParams: initHashParams
   }));
@@ -66,8 +65,7 @@ export function initRouter(routerControl: TRouterControl) {
     const regex = /^#?$|^#!/;
     if (regex.test(newHash) || regex.test(oldHash)) {
       const [newHashHead, newHashParams] = parseHash(newHash)
-      setRouter(router => ({
-        ...router, 
+      setRouter(router => ({...router, 
         hashHead: newHashHead,
         hashParams: newHashParams
       }));
@@ -75,35 +73,7 @@ export function initRouter(routerControl: TRouterControl) {
   });
 }
 
-/* function parseHash(hash: string) {
-
-  console.log('call parseHash')
-
-  let hashHead = '';
-  let hashParams = {} as THashParams;
-
-  const matches = hash.match(/^(#![\w-]+)(?:\?([&=\w,]+))?/i);
-
-  if (matches) { 
-    hashHead = matches[1];
-    
-    if (matches[2]) {
-      matches[2].split('&')
-        .forEach(s => {
-          const [key, val = ''] = s.split('=').map(x => x.trim());
-          if (key) {
-            hashParams[key] = val;
-          }
-        });
-    }
-  }
-
-  return [
-    hashHead,
-    hashParams
-  ] as [string, THashParams]
-} */
-
+// парсинг фрагмента
 function parseHash(hash: string) {
   console.log('call parseHash')
 

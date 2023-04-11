@@ -61,6 +61,10 @@
   flex-grow: 1;
   flex-direction: column;
 }
+.catalog__sort {
+  padding: 10px;
+  padding-bottom: 0;
+}
 .catalog__products {
   display: flex;
   flex-grow: 1;
