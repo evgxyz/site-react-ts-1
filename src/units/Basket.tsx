@@ -49,13 +49,13 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
       const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
         basket.products[index].count++;
-        newBasket = { ...basket, 
+        newBasket = {...basket, 
           totalPrice: getTotalPrice(basket.products)
         };
       }
       else {
         basket.products.push({...product, count: 1});
-        newBasket = { ...basket, 
+        newBasket = {...basket, 
           totalCount: basket.products.length,
           totalPrice: getTotalPrice(basket.products)
         };
@@ -73,7 +73,7 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
         if (basket.products[index].count <= 0) {
           basket.products.splice(index, 1);
         }
-        newBasket = { ...basket, 
+        newBasket = {...basket, 
           totalCount: basket.products.length,
           totalPrice: getTotalPrice(basket.products)
         };
@@ -91,7 +91,7 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
       const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
         basket.products.splice(index, 1);
-        newBasket = { ...basket, 
+        newBasket = {...basket, 
           totalCount: basket.products.length,
           totalPrice: getTotalPrice(basket.products)
         };

@@ -383,7 +383,7 @@ function FilterProducers(props: TFilterProducersProps) {
     .filter(pr => (pr.checked || producerIds.includes(pr.id)));
 
   producersList.sort(
-    (x, y) => compare(x.checked, y.checked)
+    (x, y) => compare(y.checked, x.checked)
   );
   
   if (!expanded) {
@@ -393,33 +393,34 @@ function FilterProducers(props: TFilterProducersProps) {
 
   return (
     <>
-      <div>
-        <input type='text' value={queryProducers} placeholder='Найти' 
-          onChange={queryProducersOnChange} />
-      </div>
-      <ul className={['filter__producers-list', expanded ? '--expanded' : ''].join(' ')}>
-        { 
-          producersList.map(producer => {
-              return (
-                <li key={producer.id}>
-                  <label>
-                    <input type='checkbox' 
-                      checked={producer.checked} 
-                      onChange={() => {producerOnChange(producer.id)}}
-                    />
-                    {producer.title}
-                  </label>
-                </li>
-              );
-            }
-          )
-        }
-      </ul>
-      <span 
-        className={['toggle-link toggle-link--expander', expanded ? '--expanded' : ''].join(' ')} 
-        onClick={expandedToogleOnClick}>
-        {expanded ? 'Свернуть' : 'Показать все'}
-      </span>
+    <div>
+      <input type='text' value={queryProducers} placeholder='Найти' 
+        onChange={queryProducersOnChange} />
+    </div>
+    <ul className={['filter__producers-list', expanded ? '--expanded' : ''].join(' ')}>
+      { 
+        producersList.map(producer => {
+            return (
+              <li key={producer.id}>
+                <label>
+                  <input type='checkbox' 
+                    checked={producer.checked} 
+                    onChange={() => {producerOnChange(producer.id)}}
+                  />
+                  {producer.title}
+                </label>
+              </li>
+            );
+          }
+        )
+      }
+    </ul>
+    <span 
+      className={['toggle-link toggle-link--expander', 
+        expanded ? '--expanded' : ''].join(' ')} 
+      onClick={expandedToogleOnClick}>
+      {expanded ? 'Свернуть' : 'Показать все'}
+    </span>
     </>
   );
 }
@@ -454,7 +455,7 @@ function FilterCategories(props: TFilterCategoriesProps) {
   
   if (!expanded) {
     cateroriesList.sort(
-      (x, y) => compare(x.checked, y.checked)
+      (x, y) => compare(y.checked, x.checked)
     );
     
     const maxLen = 3;
@@ -463,29 +464,30 @@ function FilterCategories(props: TFilterCategoriesProps) {
 
   return (
     <>
-      <ul className={['filter__categories-list', expanded ? '--expanded' : ''].join(' ')}>
-        { 
-          cateroriesList.map(category => {
-              return (
-                <li key={category.id}>
-                  <label>
-                    <input type='checkbox' 
-                      checked={category.checked} 
-                      onChange={() => {categoryOnChange(category.id)}}
-                    />
-                    {category.title}
-                  </label>
-                </li>
-              );
-            }
-          )
-        }
-      </ul>
-      <span 
-        className={['toggle-link toggle-link--expander', expanded ? '--expanded' : ''].join(' ')} 
-        onClick={expandedToogleOnClick}>
-        {expanded ? 'Свернуть' : 'Показать все'}
-      </span>
+    <ul className={['filter__categories-list', expanded ? '--expanded' : ''].join(' ')}>
+      { 
+        cateroriesList.map(category => {
+            return (
+              <li key={category.id}>
+                <label>
+                  <input type='checkbox' 
+                    checked={category.checked} 
+                    onChange={() => {categoryOnChange(category.id)}}
+                  />
+                  {category.title}
+                </label>
+              </li>
+            );
+          }
+        )
+      }
+    </ul>
+    <span 
+      className={['toggle-link toggle-link--expander', 
+        expanded ? '--expanded' : ''].join(' ')} 
+      onClick={expandedToogleOnClick}>
+      {expanded ? 'Свернуть' : 'Показать все'}
+    </span>
     </>
   );
 }
