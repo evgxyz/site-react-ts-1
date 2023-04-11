@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {isIntStr, mergeObj, addObj, range, compare} from './utils';
+import {isIntStr, range, compare} from './utils';
 import {TStateControl} from './stateControl'
 import {useRouterControl} from './Router';
 import {TBasketControl} from './Basket';
@@ -121,11 +121,11 @@ export function Catalog(props: TCatalogProps) {
 
       const {products, totalPages} = await fetchProducts(catalogParams, page);
       setTimeout(() => {
-        setCatalogParams(cp => mergeObj(cp, {
+        setCatalogParams(cp => ({...cp, 
           updateResultFlag: false,
           resetPageFlag: false,
         }));
-        setCatalogResult(cr => mergeObj(cr, {
+        setCatalogResult(cr => ({...cr, 
           products: products,
           totalPages: totalPages,
         }));
@@ -139,17 +139,17 @@ export function Catalog(props: TCatalogProps) {
     // производители
     const producersAll = await fetchProducers();
     const producers = producersAll.map(pr => 
-      mergeObj(pr, {checked: producerIds.includes(pr.id)})
+      ({...pr, checked: producerIds.includes(pr.id)})
     );
 
     // категории
     const categoriesAll = await fetchCategories();
     const categories = categoriesAll.map(ct => 
-      mergeObj(ct, {checked: categoryIds.includes(ct.id)})
+      ({...ct, checked: categoryIds.includes(ct.id)})
     );
 
     setCatalogParams(cp => { 
-      return mergeObj(cp, {
+      return ({...cp, 
         priceFr: priceFr,
         priceTo: priceTo,
         producers: producers,
@@ -171,7 +171,7 @@ export function Catalog(props: TCatalogProps) {
   }, [catalogParams, updateCatalogResult]);
 
   React.useEffect(() => {
-    setCatalogParams(cp => mergeObj(cp, {
+    setCatalogParams(cp => ({...cp, 
       updateResultFlag: true,
       resetPageFlag: false
     }));
@@ -255,7 +255,7 @@ function Filter(props: TFilterProps) {
   // отправить форму
   function filterFormSubmit(ev: React.SyntheticEvent) {
     ev.preventDefault();
-    setCatalogParams(cp => mergeObj(cp, {
+    setCatalogParams(cp => ({...cp, 
       updateResultFlag: true,
       resetPageFlag: true
     }));
@@ -298,7 +298,7 @@ function FilterPrice(props: TFilterPriceProps) {
       if (!isFinite(price)) {  
         price = defaultPriceFr;
       }
-      setCatalogParams(fp => mergeObj(fp, {priceFr: price}));
+      setCatalogParams(fp => ({...fp, priceFr: price}));
     }
   }
 
@@ -310,7 +310,7 @@ function FilterPrice(props: TFilterPriceProps) {
       if (!isFinite(price)) { 
         price = defaultPriceTo;
       }
-      setCatalogParams(fp => mergeObj(fp, {priceTo: price}));
+      setCatalogParams(fp => ({...fp, priceTo: price}));
     }
   }
 
@@ -357,9 +357,9 @@ function FilterProducers(props: TFilterProducersProps) {
   function producerOnChange(producerId: number) {
     setCatalogParams(fp => { 
       const newProducers = fp.producers.map(
-        pr => (pr.id === producerId) ? addObj(pr, {checked: !pr.checked}) : pr
+        pr => (pr.id === producerId) ? Object.assign(pr, {checked: !pr.checked}) : pr
       );
-      return mergeObj(fp, {producers: newProducers})
+      return ({...fp, producers: newProducers})
     });
   }
 
@@ -428,9 +428,9 @@ function FilterCategories(props: TFilterCategoriesProps) {
   function categoryOnChange(categoryId: number) {
     setCatalogParams(fp => { 
       const newCategories = fp.categories.map(
-        ct => (ct.id == categoryId) ? addObj(ct, {checked: !ct.checked}) : ct
+        ct => (ct.id == categoryId) ? Object.assign(ct, {checked: !ct.checked}) : ct
       );
-      return mergeObj(fp, {categories: newCategories})
+      return ({...fp, categories: newCategories})
     });
   }
 
@@ -494,9 +494,9 @@ function HotCategories(props: THotCategoriesProps) {
   function categoryOnChange(categoryId: number) {
     setCatalogParams(cp => { 
       const categories = cp.categories.map(
-        ct => (ct.id == categoryId) ? addObj(ct, {checked: !ct.checked}) : ct
+        ct => (ct.id == categoryId) ? Object.assign(ct, {checked: !ct.checked}) : ct
       );
-      return mergeObj(cp, {
+      return ({...cp, 
         categories: categories, 
         updateResultFlag: true,
         resetPageFlag: true
