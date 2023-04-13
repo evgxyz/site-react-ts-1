@@ -14,8 +14,8 @@ export function AdminPage() {
   }, []);
 
   return (
-    <div className='main-page'>
-      <h1>Админка</h1>
+    <div className='admin-page'>
+      <h1 className='admin-page__title'>Админка</h1>
     </div>
   );
 }

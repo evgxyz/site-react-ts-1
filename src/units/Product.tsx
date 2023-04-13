@@ -69,7 +69,7 @@ export function ProductPage(props: TProductPageProps) {
     return (
       <div className='product-page'>
         <div className='product-page__content'>
-        <b>{ product ? 'Загрузка...' : 'Продукт не найден' }</b>
+          <b>{ product ? 'Загрузка...' : 'Продукт не найден' }</b>
         </div>
       </div>
     )
