@@ -292,8 +292,8 @@ body {
   column-gap: 10px;
 
   &__body {
-    flex-basis: 15rem;
-    flex-grow: 1;
+    flex-basis: 50%;
+    //flex-grow: 1;
     flex-shrink: 1;
   }
 

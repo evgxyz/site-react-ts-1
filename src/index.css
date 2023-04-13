@@ -233,8 +233,7 @@ body {
   column-gap: 10px;
 }
 .basket-item__body {
-  flex-basis: 15rem;
-  flex-grow: 1;
+  flex-basis: 50%;
   flex-shrink: 1;
 }
 .basket-item__title {
