@@ -1,5 +1,6 @@
 
 import React from 'react';
+import {useEnvControl} from './Env';
 import {TProduct} from './Product';
 
 export type TBasketProduct = TProduct & {count: number};
@@ -124,9 +125,12 @@ interface TBasketProps {
 
 export function Basket(props: TBasketProps) {
 
+  const [env, setEnv] = useEnvControl();
   const [basket, ] = props.basketControl;
   
-  document.title = 'Корзина';
+  React.useEffect(() => {
+    setEnv(env => ({...env, title: 'Корзина'}))
+  }, []);
   
   return (
     <div className='basket'>

@@ -40,10 +40,8 @@ body {
 
 // основное содержание страницы
 .main {
-  display: flex;
   flex-grow: 1;
   border: 1px solid gray;
-  //@include debug-border(blue);  
 }
 
 // подвал

@@ -8,7 +8,7 @@ export function Navline() {
 
   return (
     <nav className='navline'>
-      {env.navline}
+      {'Главная / ' + env.navline}
     </nav>
   );
 }

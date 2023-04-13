@@ -59,7 +59,7 @@ export function App() {
           basketTray={<BasketTray basketControl={basketControl} />} 
         />
         <Navline />
-        <main className='main'>
+        <main className='main'>     
           {pageContent}
         </main>
         <Navline />
