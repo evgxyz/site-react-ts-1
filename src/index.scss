@@ -1,5 +1,9 @@
 
 
+body {
+  font-family: Roboto, sans-serif;
+}
+
 // временная граница для отладки
 @mixin debug-border($color) { 
   border: 1px solid $color;  
@@ -179,13 +183,20 @@
 
 .catalog-product-card {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 15rem;
-  height: 13rem;
-  padding: 10px;
+  min-width: 15rem;
+  flex-basis: 18rem;
+  min-height: 13rem;
   border: 1px solid gray;  
   background-color: bisque;
+  padding: 10px;
+  flex-direction: column;
+  justify-content: space-between;
+  row-gap: 1.5em;
+
+  &__body {
+    flex-grow: 1;
+    //@include debug-border(red)
+  }
 
   &__title {
     font-weight: bold;
@@ -195,9 +206,9 @@
     font-weight: bold;
   }
 
-  &__menu-info {
-    margin-bottom: 5px;
-  }
+  // &__menu {
+  //   //@include debug-border(blue)
+  // }
 }
 
 .product-page {
@@ -214,8 +225,8 @@
     font-weight: bold;
   }
 
-  &__menu-info {
-    margin-bottom: 5px;
+  &__menu {
+    margin-top: 1em;
   }
 }
 

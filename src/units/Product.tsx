@@ -78,7 +78,7 @@ export function ProductPage(props: TProductPageProps) {
 
   return (
     <div className='product-page'>
-      <div className='product-page__content'>
+      <div className='product-page__body'>
         <div className='product-page__title'>
           {product.title}
         </div>
@@ -120,7 +120,7 @@ export function CatalogProductCard(props: TProductCardProps) {
 
   return (
     <div className='catalog-product-card'>
-      <div className='catalog-product-card__content'>
+      <div className='catalog-product-card__body'>
         <div className='catalog-product-card__title'>
           <a href={`#!product?id=${product.id}`}>
             {product.title}
