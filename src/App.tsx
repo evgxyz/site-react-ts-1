@@ -1,11 +1,14 @@
 
 import React from 'react';
 import {useRouterControl, initRouter} from './units/Router';
+import {MainMenu} from './units/MainMenu'
 import {Header} from './units/Header'
 import {Navline} from './units/Navline'
+import {MainPage} from './units/MainPage'
 import {useBasketReducer, initBasket, Basket, BasketTray} from './units/Basket'
 import {Catalog} from './units/Catalog'
 import {ProductPage} from './units/Product'
+import {AdminPage} from './units/AdminPage'
 
 export function App() {
 
@@ -15,16 +18,7 @@ export function App() {
   React.useEffect(() => {initRouter([router, setRouter])}, []);
   React.useEffect(() => {initBasket(basketControl)}, []);
 
-  document.title = 'Главная';
-  let pageContent = (
-    <div className='main-content'>
-      <h1>Главная</h1>
-      <div><a href="#!catalog">Каталог</a></div>
-      <div><a href="#!basket">Корзина</a></div>
-      <div><a href="#!admin">Админка</a></div>
-    </div>
-  )
-
+  let pageContent: JSX.Element = <></>;
   if (router.hashHead === '#!catalog') {
     pageContent = <Catalog basketControl={basketControl} />
   } 
@@ -38,23 +32,16 @@ export function App() {
   } 
   else 
   if (router.hashHead === '#!admin') {
-    document.title = 'Админка';
-    pageContent = <h1>Админка</h1>
+    pageContent = <AdminPage />
   }
-
-  const mainMenu = (
-    <div className='main-menu'> 
-      <a href="#">Главная</a> {' | '}
-      <a href="#!catalog">Каталог</a> {' | '} 
-      <a href="#!basket">Корзина</a> {' | '} 
-      <a href="#!admin">Админка</a> 
-    </div>
-  );
+  else {
+    pageContent = <MainPage />
+  }
 
   return (
     <div id='page-wrapper'>
       <div id='page-content'>
-        {mainMenu}
+        <MainMenu />
         <Header 
           basketTray={<BasketTray basketControl={basketControl} />} 
         />

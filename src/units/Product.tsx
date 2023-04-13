@@ -57,7 +57,8 @@ export function ProductPage(props: TProductPageProps) {
   React.useEffect(() => {
     const title = product ? 
       (product.title ?? 'Загрузка...') : 'Продукт не найден';
-    const navline = product?.title ?? '';
+    const navline = [
+      <a href='#!catalog'>Каталог</a>, product?.title ?? '' ];
     setEnv(env => ({...env, 
       title: title,
       navline: navline

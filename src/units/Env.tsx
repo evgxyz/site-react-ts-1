@@ -5,17 +5,18 @@ import {
   useContextStateControl
 } from './stateControl'
 
+export type TNavlineItem = (string | JSX.Element);
+
 export interface TEnv {
   title: string,
-  navline: string,
+  navline: TNavlineItem[],
 };
 
 type TEnvControl0 = TStateControl0<TEnv>;
-type TEnvControl = TStateControl<TEnv>;
 
 const defaultEnv: TEnv = {
   title: '',
-  navline: ''
+  navline: []
 };
 
 const defaultEnvControl: TEnvControl0 = [

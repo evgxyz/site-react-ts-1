@@ -180,7 +180,10 @@ export function Catalog(props: TCatalogProps) {
   }, [page]);
 
   React.useEffect(() => {
-    setEnv(env => ({...env, title: `Каталог [${page}]`}))
+    setEnv(env => ({...env, 
+      title: `Каталог [${page}]`,
+      navline: ['Каталог']
+    }))
   }, [page]);
 
   let hashQueryStr = catalogParamsHashQuery(catalogParams).toString();

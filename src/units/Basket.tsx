@@ -129,7 +129,10 @@ export function Basket(props: TBasketProps) {
   const [basket, ] = props.basketControl;
   
   React.useEffect(() => {
-    setEnv(env => ({...env, title: 'Корзина'}))
+    setEnv(env => ({...env, 
+      title: 'Корзина',
+      navline: ['Корзина']
+    }))
   }, []);
   
   return (
