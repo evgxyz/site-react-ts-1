@@ -2,6 +2,7 @@
 import React from 'react';
 import {useRouterControl, initRouter} from './units/Router';
 import {Header} from './units/Header'
+import {Navline} from './units/Navline'
 import {useBasketReducer, initBasket, Basket, BasketTray} from './units/Basket'
 import {Catalog} from './units/Catalog'
 import {ProductPage} from './units/Product'
@@ -57,10 +58,14 @@ export function App() {
         <Header 
           basketTray={<BasketTray basketControl={basketControl} />} 
         />
-        <main className='main'>{pageContent}</main>
+        <Navline />
+        <main className='main'>
+          {pageContent}
+        </main>
+        <Navline />
         <footer className='footer'>
           <div className='footer__content'>
-          footer
+            footer
           </div>
         </footer>
       </div>

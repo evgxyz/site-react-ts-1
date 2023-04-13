@@ -1,5 +1,6 @@
 
 import React from 'react';
+import {useEnvControl} from './Env';
 import {useRouterControl} from './Router';
 import {TBasketControl, ProductBasketMenu} from './Basket';
 
@@ -34,7 +35,8 @@ export interface TProductPageProps {
 
 export function ProductPage(props: TProductPageProps) {
 
-  const [router, ] = useRouterControl();
+  const [env, setEnv] = useEnvControl();
+  const [router, setRouter] = useRouterControl();
 
   let productId = parseInt(router.hashParams['id']);
   if (!isFinite(productId)) {
@@ -52,57 +54,55 @@ export function ProductPage(props: TProductPageProps) {
     getProduct();
   }, []);
 
-  if (!product) {
-    document.title = 'Продукт не найден';
+  React.useEffect(() => {
+    const title = product ? 
+      (product.title ?? 'Загрузка...') : 'Продукт не найден';
+    const navline = product?.title ?? '';
+    setEnv(env => ({...env, 
+      title: title,
+      navline: navline
+    }));
+  }, [product])
+
+  if (!product?.title) {
     return (
       <div className='product-page'>
         <div className='product-page__content'>
-         <b>Продукт не найден</b>
+        <b>{ product ? 'Загрузка...' : 'Продукт не найден' }</b>
         </div>
       </div>
     )
   }
-
-  if (!product.id) {
-    document.title = 'Загрузка...';
-    return (
-      <div className='product-page'>
-        <div className='product-page__content'>
-         <b>Загрузка...</b>
-        </div>
-      </div>
-    )
-  }
-
-  document.title = product.title;
 
   return (
     <div className='product-page'>
-      <div className='product-page__body'>
-        <div className='product-page__title'>
-          {product.title}
+      <h1 className='product-page__title'>
+        {product.title}
+      </h1>
+      <div className='product-page__content'>
+        <div className='product-page__body'>
+          <div className='product-page__description'>
+            {product.description}
+          </div>
+          <div className='product-page__price'>
+            Цена: {product.price} ₽
+          </div>
+          <div className='product-page__categories'>
+            Категории: {product.categories.join(', ')}
+          </div>
+          <div className='product-page__producer'>
+            Производитель: {product.producer}
+          </div>
+          <div className='product-page__code'>
+            Штрихкод: {product.code}
+          </div>
         </div>
-        <div className='product-page__description'>
-          {product.description}
+        <div className='product-page__menu'>
+          <ProductBasketMenu 
+            product={product}
+            basketControl={props.basketControl} 
+          />
         </div>
-        <div className='product-page__price'>
-          Цена: {product.price} ₽
-        </div>
-        <div className='product-page__categories'>
-          Категории: {product.categories.join(', ')}
-        </div>
-        <div className='product-page__producer'>
-          Производитель: {product.producer}
-        </div>
-        <div className='product-page__code'>
-          Штрихкод: {product.code}
-        </div>
-      </div>
-      <div className='product-page__menu'>
-        <ProductBasketMenu 
-          product={product}
-          basketControl={props.basketControl} 
-        />
       </div>
     </div>
   );

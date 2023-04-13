@@ -40,7 +40,7 @@ interface TRouterProviderProps {
 export function RouterProvider(props: TRouterProviderProps) {
   
   const [router, setRouter] = React.useState(defaultRouter);
-  
+
   return (
     <RouterContext.Provider value={[router, setRouter]}>
       {props.children}

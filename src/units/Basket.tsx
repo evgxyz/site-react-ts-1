@@ -130,20 +130,22 @@ export function Basket(props: TBasketProps) {
   
   return (
     <div className='basket'>
-      <h1>Корзина</h1>
-      <div className='basket__item-list'>
-        {
-          basket.products.map(product => (
-            <BasketItem 
-              key={product.id} 
-              product={product} 
-              basketControl={props.basketControl} 
-            />
-          ))
-        }
-      </div>
-      <div className='basket__info'>
-        Всего товаров {basket.totalCount} на {basket.totalPrice} ₽
+      <h1 className='basket__title'>Корзина</h1>
+      <div className='basket__content'>
+        <div className='basket__info'>
+          Всего товаров {basket.totalCount} на {basket.totalPrice} ₽
+        </div> 
+        <div className='basket__item-list'>
+          {
+            basket.products.map(product => (
+              <BasketItem 
+                key={product.id} 
+                product={product} 
+                basketControl={props.basketControl} 
+              />
+            ))
+          }
+        </div>
       </div>
     </div>
   );
@@ -161,7 +163,7 @@ export function BasketItem(props: TBasketItemProps) {
 
   return (
     <div className='basket-item'>
-      <div className='basket-item__content'>
+      <div className='basket-item__body'>
         <div className='basket-item__title'>
           <a href={`#!product?id=${product.id}`}>
             {product.title}

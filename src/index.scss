@@ -40,14 +40,15 @@ body {
 
 // основное содержание страницы
 .main {
+  display: flex;
   flex-grow: 1;
-  //@include debug-border(green);
+  border: 1px solid gray;
+  //@include debug-border(blue);  
 }
 
 // подвал
 .footer {
   justify-self: flex-end;
-  margin: 10px 0;
 
   &__content {
     padding: 20px;
@@ -61,19 +62,26 @@ body {
   text-align: center;
 }
 
+.navline {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid gray; 
+}
+
 .catalog {
-  margin-top: 10px;
-  //@include debug-border(blue);
+
+  &__title {
+    margin: 10px;
+  }
 
   &__hot-categories {
     border: 1px solid gray;
-    //border-bottom-width: 0;
+    border-left: none;
+    border-right: none;
   }
 
   &__body {
     display: flex;
-    border: 1px solid gray;
-    border-top-width: 0;
   }
 
   &__filter {
@@ -122,6 +130,8 @@ body {
     justify-content: center;
     align-items: center;
   }
+
+  //@include debug-border(blue);
 }
 
 .hot-categories-list {
@@ -205,20 +215,15 @@ body {
   &__price {
     font-weight: bold;
   }
-
-  // &__menu {
-  //   //@include debug-border(blue)
-  // }
 }
 
 .product-page {
-  margin: 10px 0;
-  padding: 10px;
-  border: 1px solid gray;  
-
   &__title {
-    font-size: 1.5em;
-    font-weight: bold;
+    margin: 10px;
+  }
+
+  &__content {
+    margin: 10px;
   }
 
   &__price {
@@ -238,50 +243,54 @@ body {
 }
 
 .basket {
-  height: 100%;
+  width: 100%;
+
+  &__title {
+    margin: 10px;
+  }
 
   &__item-list {
     display: flex;
+    flex-grow: 1;
     height: 100%;
     flex-direction: column;
     justify-content: flex-start;
     row-gap: 10px;
     padding: 10px;
-    border: 1px solid gray; 
   }
 
   &__info {
     padding: 10px;
     border: 1px solid gray; 
-    border-top: 0;
+    border-left: none;
+    border-right: none;
   }
-
-  //@include debug-border(red);
 }
 
 .basket-item {
   display: flex;
-  //min-height: 5rem;
   padding: 10px;
   border: 1px solid gray;  
   background-color: bisque;
-  flex-direction: row;
-  column-gap: 20px;
+  column-gap: 10px;
 
-  &__content {
-    flex-basis: 20rem;
+  &__body {
+    flex-basis: 15rem;
+    flex-grow: 1;
+    flex-shrink: 1;
   }
 
-  &__title {
-    font-weight: bold;
-  }
+    &__title {
+      font-weight: bold;
+    }
 
-  &__price {
-    font-weight: bold;
-  }
+    &__price {
+      font-weight: bold;
+    }
 
   &__menu {
-    margin-bottom: 5px;
+    flex-grow: 1;
+    flex-shrink: 1;
   }
 }
 

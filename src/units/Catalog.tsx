@@ -3,6 +3,7 @@ import React from 'react';
 import {isIntStr, range, compare} from './utils';
 import {TStateControl} from './stateControl'
 import {useRouterControl} from './Router';
+import {useEnvControl} from './Env';
 import {TBasketControl} from './Basket';
 import {TProduct, TProducer, TCategory, CatalogProductCard} from './Product';
 import {initProducts} from '../data/products';
@@ -69,6 +70,7 @@ export interface TCatalogProps {
 
 export function Catalog(props: TCatalogProps) {
 
+  const [env, setEnv] = useEnvControl();
   const [router, setRouter] = useRouterControl();
 
   // номер страницы
@@ -177,14 +179,16 @@ export function Catalog(props: TCatalogProps) {
     }));
   }, [page]);
 
-  document.title = `Каталог [${page}]`;
+  React.useEffect(() => {
+    setEnv(env => ({...env, title: `Каталог [${page}]`}))
+  }, [page]);
+
   let hashQueryStr = catalogParamsHashQuery(catalogParams).toString();
   let hashStr = '#!catalog' + (hashQueryStr !== '' ? `?${hashQueryStr}&` : '?');
 
   return (
     <div className='catalog'>
-      <h1>Каталог</h1>
-      {/* <pre>{JSON.stringify(catalogParams)}</pre> */}
+      <h1 className='catalog__title'>Каталог</h1>
       <div className='catalog__hot-categories'>
         <HotCategories 
           catalogParamsControl={[catalogParams, setCatalogParams]}
