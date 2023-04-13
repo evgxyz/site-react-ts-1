@@ -3,12 +3,12 @@ import React from 'react';
 import {useEnvControl} from './Env';
 import {TProduct, fetchProductsAll} from './Products';
 
-interface TAdminState {
+interface TAdminProducts {
   products: TProduct[],
   initFlag: boolean,
 }
 
-const defaultAdminState: TAdminState = {
+const defaultAdminProducts: TAdminProducts = {
   products: [],
   initFlag: false,
 }
@@ -16,12 +16,12 @@ const defaultAdminState: TAdminState = {
 export function Admin() {
 
   const [ , setEnv] = useEnvControl();
-  const [adminState, setAdminState] = React.useState(defaultAdminState);
+  const [adminProducts, setAdminProducts] = React.useState(defaultAdminProducts);
 
-  async function updateAdminState() {
+  async function updateAdminProducts() {
     const products = await fetchProductsAll();
     setTimeout(() => {
-      setAdminState(st => ({...st,
+      setAdminProducts(st => ({...st,
         products: products,
         initFlag: true
       }));
@@ -36,33 +36,41 @@ export function Admin() {
   }, []);
 
   React.useEffect(() => {
-    updateAdminState();
+    updateAdminProducts();
   }, []);
 
   return (
     <div className='admin'>
       <h1 className='admin__title'>Админка</h1>
       <div className='admin__content'>
-        <div className='admin-products__info'>
-          Всего товаров: {adminState.products.length}
-        </div> 
-        <div className='admin-products__item-list'>
-          {
-            adminState.products.map(product => (
-              <AdminProductsItem 
-                key={product.id} 
-                product={product} 
-                /* basketControl={props.basketControl}  */
-              />
-            ))
-          }
-        </div>
+        {
+          adminProducts.initFlag ? 
+            <div className='admin-products'>
+              <div className='admin-products__info'>
+                Всего товаров: {adminProducts.products.length}
+              </div> 
+              <div className='admin-products__list'>
+                {
+                  adminProducts.products.map(product => (
+                    <AdminProductsItem 
+                      key={product.id} 
+                      product={product} 
+                      /* basketControl={props.basketControl}  */
+                    />
+                  ))
+                }
+              </div>
+            </div>
+          : <div className='admin-products__msg'>
+              <b>Загрузка...</b>
+            </div>
+        }
       </div>
     </div>
   );
 }
 
-// карточка продукта в корзине
+// карточка продукта в админке
 export interface TAdminProductsItemProps {
   product: TProduct,
 }
@@ -74,10 +82,16 @@ export function AdminProductsItem(props: TAdminProductsItemProps) {
   return (
     <div className='admin-products-item'>
       <div className='admin-products-item__body'>
+        <div className='admin-products-item__id'>
+          id: {product.id}
+        </div>
         <div className='admin-products-item__title'>
           <a href={`#!product?id=${product.id}`}>
             {product.title}
           </a>
+        </div>
+        <div className='admin-products-item__description'>
+          {product.description}
         </div>
         <div className='admin-products-item__price'>
           Цена: {product.price} ₽
@@ -87,6 +101,9 @@ export function AdminProductsItem(props: TAdminProductsItemProps) {
         </div>
         <div className='admin-products-item__code'>
           Штрихкод: {product.code}
+        </div>
+        <div className='catalog-product-card__categories'>
+          Категории: {product.categories.join(', ')}
         </div>
       </div>
       <div className='admin-products-item__menu'>

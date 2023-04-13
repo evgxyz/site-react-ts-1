@@ -68,7 +68,7 @@ export function ProductPage(props: TProductPageProps) {
   if (!product?.title) {
     return (
       <div className='product-page'>
-        <div className='product-page__content'>
+        <div className='product-page__msg'>
           <b>{ product ? 'Загрузка...' : 'Продукт не найден' }</b>
         </div>
       </div>
@@ -133,14 +133,14 @@ export function CatalogProductCard(props: TProductCardProps) {
         <div className='catalog-product-card__price'>
           Цена: {product.price} ₽
         </div>
-        <div className='catalog-product-card__categories'>
-          Категории: {product.categories.join(', ')}
-        </div>
         <div className='catalog-product-card__producer'>
           Производитель: {product.producer}
         </div>
         <div className='catalog-product-card__code'>
           Штрихкод: {product.code}
+        </div>
+        <div className='catalog-product-card__categories'>
+          Категории: {product.categories.join(', ')}
         </div>
       </div>
       <div className='catalog-product-card__menu'>

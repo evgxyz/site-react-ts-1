@@ -142,7 +142,7 @@ export function Basket(props: TBasketProps) {
         <div className='basket__info'>
           Всего товаров {basket.totalCount} на {basket.totalPrice} ₽
         </div> 
-        <div className='basket__item-list'>
+        <div className='basket__list'>
           {
             basket.products.map(product => (
               <BasketItem 
