@@ -117,24 +117,6 @@ export function useBasketReducer() {
   return React.useReducer(basketReducer, defaultBasket);
 }
 
-// корзины трей для шапки
-interface TBasketTrayProps {
-  basketControl: TBasketControl
-}
-
-export function BasketTray(props: TBasketTrayProps) {
-
-  const [basket, ] = props.basketControl;
-
-  return (
-    <div style={{color: 'blue'}}>
-      <a href='#!basket'>
-        В корзине товаров {basket.totalCount} на {basket.totalPrice} ₽
-      </a>
-    </div>
-  );
-}
-
 // корзина
 interface TBasketProps {
   basketControl: TBasketControl
@@ -149,7 +131,7 @@ export function Basket(props: TBasketProps) {
   return (
     <div className='basket'>
       <h1>Корзина</h1>
-      <div className='basket-item-list'>
+      <div className='basket__item-list'>
         {
           basket.products.map(product => (
             <BasketItem 
@@ -159,6 +141,9 @@ export function Basket(props: TBasketProps) {
             />
           ))
         }
+      </div>
+      <div className='basket__info'>
+        Всего товаров {basket.totalCount} на {basket.totalPrice} ₽
       </div>
     </div>
   );
@@ -231,11 +216,12 @@ export function BasketItemMenu(props: TBasketItemMenuProps) {
   return (
     <div className='basket-item-menu'>
       <div className='basket-item-menu__info'>
-        {`${count} шт на ${count*product.price} ₽`}
+        {`${count} шт на ${count * product.price} ₽`}
       </div>
       <div className='basket-item-menu__btns'>
         <button className='basket-item-menu__btn' onClick={basketAdd}>+</button>{' '}
-        <button className='basket-item-menu__btn' onClick={basketSub}>–</button>{' '}
+        <button className='basket-item-menu__btn' 
+          disabled={count === 1} onClick={basketSub}>–</button>{' '}
         <button className='basket-item-menu__btn' onClick={basketDel}>x</button>
       </div>
     </div>
@@ -271,13 +257,33 @@ export function ProductBasketMenu(props: TProductBasketMenuProps) {
   return (
     <div className='product-basket-menu'>
       <div className='product-basket-menu__info'>
-        {`${count} шт на ${count*product.price} ₽`}
+        {`${count} шт на ${count * product.price} ₽`}
       </div>
       <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
-      <button className='product-basket-menu__btn' onClick={basketSub}>–</button>{' '}
-      <button className='product-basket-menu__btn' onClick={basketDel}>x</button>
+      <button className='product-basket-menu__btn' 
+        disabled={count === 0} onClick={basketSub}>–</button>{' '}
+      <button className='product-basket-menu__btn' 
+        disabled={count === 0} onClick={basketDel}>x</button>
     </div>
   )
+}
+
+// трей корзины для шапки
+interface TBasketTrayProps {
+  basketControl: TBasketControl
+}
+
+export function BasketTray(props: TBasketTrayProps) {
+
+  const [basket, ] = props.basketControl;
+
+  return (
+    <div className='basket-tray'>
+      <a href='#!basket'>
+        В корзине товаров {basket.totalCount} на {basket.totalPrice} ₽
+      </a>
+    </div>
+  );
 }
 
 // инициализация корзины

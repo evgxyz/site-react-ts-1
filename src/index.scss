@@ -228,17 +228,24 @@
 
 .basket {
   height: 100%;
-  //@include debug-border(red);
-}
 
-.basket-item-list {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  justify-content: flex-start;
-  row-gap: 10px;
-  padding: 10px;
-  border: 1px solid gray; 
+  &__item-list {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    row-gap: 10px;
+    padding: 10px;
+    border: 1px solid gray; 
+  }
+
+  &__info {
+    padding: 10px;
+    border: 1px solid gray; 
+    border-top: 0;
+  }
+
+  //@include debug-border(red);
 }
 
 .basket-item {
@@ -285,6 +292,10 @@
     font-size: large; 
     font-weight: bold;
   }
+}
+
+.basket-tray {
+  color: blue;
 }
 
 .toggle-link {

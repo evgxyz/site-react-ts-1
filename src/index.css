@@ -183,8 +183,7 @@
 .basket {
   height: 100%;
 }
-
-.basket-item-list {
+.basket__item-list {
   display: flex;
   height: 100%;
   flex-direction: column;
@@ -192,6 +191,11 @@
   row-gap: 10px;
   padding: 10px;
   border: 1px solid gray;
+}
+.basket__info {
+  padding: 10px;
+  border: 1px solid gray;
+  border-top: 0;
 }
 
 .basket-item {
@@ -231,6 +235,10 @@
   vertical-align: middle;
   font-size: large;
   font-weight: bold;
+}
+
+.basket-tray {
+  color: blue;
 }
 
 .toggle-link {
