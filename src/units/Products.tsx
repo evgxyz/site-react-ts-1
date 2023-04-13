@@ -161,3 +161,11 @@ export async function fetchProduct(productId: number)  {
   const product = productsAll.find(pr => pr.id === productId) as TProduct;
   return product;
 }
+
+// получение всех продуктов
+export async function fetchProductsAll()  {
+  console.log('call fetchProductsAll'); 
+  const productsAll: TProduct[] = 
+    (JSON.parse(localStorage.getItem('products') ?? 'null')) ?? [];
+  return productsAll;
+}

@@ -5,7 +5,7 @@ import {TStateControl} from './stateControl'
 import {useRouterControl} from './Router';
 import {useEnvControl} from './Env';
 import {TBasketControl} from './Basket';
-import {TProduct, TProducer, TCategory, CatalogProductCard} from './Product';
+import {TProduct, TProducer, TCategory, CatalogProductCard} from './Products';
 import {initProducts} from '../data/products';
 import {initProducers} from '../data/producers';
 import {initCategories} from '../data/categories';
@@ -110,7 +110,7 @@ export function Catalog(props: TCatalogProps) {
   const updateCatalogResult = React.useCallback(async function () {
     
     if (catalogParams.updateResultFlag && catalogParams.initFlag) {
-      console.log('call updateCatalogResult: ', JSON.stringify(catalogParams));    
+      console.log('call updateCatalogResult:', JSON.stringify(catalogParams));    
 
       if (catalogParams.resetPageFlag) {
         const hashQuery = catalogParamsHashQuery(catalogParams);
@@ -121,7 +121,7 @@ export function Catalog(props: TCatalogProps) {
         }
       }
 
-      const {products, totalPages} = await fetchProducts(catalogParams, page);
+      const {products, totalPages} = await searchProducts(catalogParams, page);
       setTimeout(() => {
         setCatalogParams(cp => ({...cp, 
           updateResultFlag: false,
@@ -211,37 +211,37 @@ export function Catalog(props: TCatalogProps) {
             </div>
             { 
               catalogParams.updateResultFlag ? 
-              <div className='catalog__msg'>
-                <div><b>Загрузка...</b></div>
-              </div> 
-            : <>
-              <div className='catalog__products'>
-                { 
-                  catalogResult.products.length > 0 ?
-                  catalogResult.products.map(product => (
-                    <CatalogProductCard 
-                      key={product.id} 
-                      product={product} 
-                      basketControl={props.basketControl} 
-                    />
-                  )) 
-                  : <b>Нет результатов</b>
-                }
-              </div>
-              <div className='catalog__products-pagination'>
-                { 
-                  range(1, catalogResult.totalPages).map(i => (
-                    <span key={i}>
-                      { i > 1 ? ' | ' : '' }
-                      { i !== page ? 
-                          <a href={hashStr + 'page=' + i}>{i}</a> 
-                        : <b>{i}</b>
-                      }
-                    </span> 
-                  ))
-                }
-              </div>
-              </>
+                <div className='catalog__msg'>
+                  <div><b>Загрузка...</b></div>
+                </div> 
+              : <>
+                <div className='catalog__products'>
+                  { 
+                    catalogResult.products.length > 0 ?
+                      catalogResult.products.map(product => (
+                        <CatalogProductCard 
+                          key={product.id} 
+                          product={product} 
+                          basketControl={props.basketControl} 
+                        />
+                      )) 
+                    : <b>Нет результатов</b>
+                  }
+                </div>
+                <div className='catalog__products-pagination'>
+                  { 
+                    range(1, catalogResult.totalPages).map(i => (
+                      <span key={i}>
+                        { i > 1 ? ' | ' : '' }
+                        { i !== page ? 
+                            <a href={hashStr + 'page=' + i}>{i}</a> 
+                          : <b>{i}</b>
+                        }
+                      </span> 
+                    ))
+                  }
+                </div>
+                </>
           }
         </div>
       </div>
@@ -625,8 +625,8 @@ function catalogParamsHashQuery(catalogParams: TCatalogParams) {
 /**********/
 
 // получение списка продкутов с "сервера"
-async function fetchProducts(catalogParams: TCatalogParams, page: number = 1) {
-  console.log('call fetchProducts');
+async function searchProducts(catalogParams: TCatalogParams, page: number = 1) {
+  console.log('call searchProducts');
 
   const perPage = 6;
   page = Math.max(1, page);

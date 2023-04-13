@@ -1,7 +1,7 @@
 
 import React from 'react';
 import {useEnvControl} from './Env';
-import {TProduct} from './Product';
+import {TProduct} from './Products';
 
 export type TBasketProduct = TProduct & {count: number};
 
