@@ -19,23 +19,26 @@ export function App() {
   React.useEffect(() => {initBasket(basketControl)}, []);
 
   let pageContent: JSX.Element = <></>;
-  if (router.hashHead === '#!catalog') {
-    pageContent = <Catalog basketControl={basketControl} />
-  } 
-  else 
-  if (router.hashHead === '#!product') {
-    pageContent = <ProductPage basketControl={basketControl} />
-  } 
-  else
-  if (router.hashHead === '#!basket') {
-    pageContent = <Basket basketControl={basketControl} />
-  } 
-  else 
-  if (router.hashHead === '#!admin') {
-    pageContent = <AdminPage />
-  }
-  else {
-    pageContent = <MainPage />
+  switch (router.hashHead) {
+    case '#!catalog': {
+      pageContent = <Catalog basketControl={basketControl} />
+    } 
+    break;
+    case '#!product': {
+      pageContent = <ProductPage basketControl={basketControl} />
+    } 
+    break;
+    case '#!basket': {
+      pageContent = <Basket basketControl={basketControl} />
+    } 
+    break;
+    case '#!admin': {
+      pageContent = <AdminPage />
+    } 
+    break;
+    default: {
+      pageContent = <MainPage />
+    }
   }
 
   return (
