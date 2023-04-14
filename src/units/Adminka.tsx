@@ -144,40 +144,119 @@ export interface TAdmProductsItemProps {
 export function AdmProductsItem(props: TAdmProductsItemProps) {
 
   const product = props.product;
+  const {delProduct} = props.admProductsCallbacks;
+
+  const [editing, setEditing] = React.useState(false);
+  const [busy, setBusy] = React.useState(false);
+
+  function toggleEditOnClick() {
+    setEditing(st => !st);
+  }
+
+  async function delProductOnClick() {
+    if (!confirm('Удалить?')) return;
+    setBusy(true);
+    const resOK = await delProduct(product.id);
+    if (!resOK) {
+      setBusy(false);
+    }
+  }
 
   return (
     <div className='adm-products-item'>
-      <div className='adm-products-item__body'>
-        <div className='adm-products-item__id'>
-          id: {product.id}
-        </div>
-        <div className='adm-products-item__title'>
-          <a href={`#!product?id=${product.id}`}>
-            {product.title}
-          </a>
-        </div>
-        <div className='adm-products-item__description'>
-          {product.description}
-        </div>
-        <div className='adm-products-item__price'>
-          Цена: {product.price} ₽
-        </div>
-        <div className='adm-products-item__producer'>
-          Производитель: {product.producer}
-        </div>
-        <div className='adm-products-item__code'>
-          Штрихкод: {product.code}
-        </div>
-        <div className='adm-products-item__categories'>
-          Категории: {product.categories.join(', ')}
-        </div>
-      </div>
-      <div className='adm-products-item__menu'>
-        <AdmProductsItemMenu 
-          productId={product.id}
-          admProductsCallbacks={props.admProductsCallbacks}
-        />
-      </div>
+      {
+        editing ?
+        <>
+          <form> 
+            <table className='adm-products-item__table'>
+              <tr>
+                <td>id:</td>
+                <td><div>{product.id}</div></td>
+              </tr>
+              <tr>
+                <td>Название:</td>
+                <td><input type='text' value={product.title} /></td>
+              </tr>
+              <tr>
+                <td>Описание:</td>
+                <td>
+                  <textarea value={product.description} 
+                    className='adm-products-item__descr-ta' />
+                </td>
+              </tr>
+              <tr>
+                <td>Цена:</td>
+                <td><input type='text' value={product.price} /></td>
+              </tr>
+              <tr>
+                <td>Производитель:</td>
+                <td><input type='text' value={product.producer} /></td>
+              </tr>
+              <tr>
+                <td>Штрихкод:</td>
+                <td><input type='text' value={product.code} /></td>
+              </tr>
+              <tr>
+                <td>Категории:</td>
+                <td><div>{product.categories.join(', ')}</div></td>
+              </tr>
+            </table>
+            <div className='adm-products-item__menu'>
+              <button className='adm-products-item__btn' 
+                  disabled={busy}
+                  onClick={toggleEditOnClick}>Отменить</button>
+              <button className='adm-products-item__btn' 
+                  disabled={busy}
+                  onClick={()=>1}>Сохранить</button>
+            </div>
+          </form>
+        </>
+        :
+        <> 
+          <table className='adm-products-item__table'>
+            <tr>
+              <td>id:</td>
+              <td><div>{product.id}</div></td>
+            </tr>
+            <tr>
+              <td>Название:</td>
+              <td><div>{product.title}</div></td>
+            </tr>
+            <tr>
+              <td>Описание:</td>
+              <td>
+                <div className='adm-products-item__descr-div'>
+                  {product.description}
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Цена:</td>
+              <td><div>{product.price}</div></td>
+            </tr>
+            <tr>
+              <td>Производитель:</td>
+              <td><div>{product.producer}</div></td>
+            </tr>
+            <tr>
+              <td>Штрихкод:</td>
+              <td><div>{product.code}</div></td>
+            </tr>
+            <tr>
+              <td>Категории:</td>
+              <td><div>{product.categories.join(', ')}</div></td>
+            </tr>
+          </table>
+          <div className='adm-products-item__menu'>
+            <button className='adm-products-item__btn' 
+                disabled={busy}
+                onClick={toggleEditOnClick}>Изменить</button>
+            <button className='adm-products-item__btn' 
+                disabled={busy}
+                onClick={delProductOnClick}>Удалить</button>
+          </div>
+        </>
+      }
     </div>
   );
 }

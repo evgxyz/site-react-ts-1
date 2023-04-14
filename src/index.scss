@@ -1,6 +1,6 @@
 
 
-body {
+* {
   font-family: Roboto, sans-serif;
 }
 
@@ -371,28 +371,54 @@ body {
 }
 
 .adm-products-item {
-  display: flex;
   padding: 10px;
   border: 1px solid gray;  
   background-color: bisque;
-  column-gap: 10px;
 
-  &__body {
-    flex-basis: 50%;
-    flex-shrink: 1;
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    td {
+      padding: 5px;
+      vertical-align: top;
+      border: 1px solid gray;  
+
+      & > div {
+        height: 1.2rem;
+        padding: 4px;
+      }
+
+      & > input[type="text"],
+      & > textarea {
+        margin: 0;
+        height: 1.2rem;
+        padding: 2px;
+        outline: none;
+      }
+
+      & > textarea {
+        padding: 3px;
+      }
+    }
+
+    td:first-child {
+      width: 10em;
+      text-align: right;
+    }
   }
 
-    &__title {
-      font-weight: bold;
-    }
+  &__descr-div {
+    min-height: 5em; 
+  }
 
-    &__price {
-      font-weight: bold;
-    }
+  &__descr-ta {
+    display: block;
+    min-height: 5em;
+  }
 
   &__menu {
-    flex-grow: 1;
-    flex-shrink: 1;
+    margin-top: 10px;
   }
 }
 
@@ -409,6 +435,20 @@ body {
     &:after {content: '▾';}
     &.--expanded:after {content: '▴';}
   }
+}
+
+button {
+  font-size: 1em;
+}
+
+input[type="text"] {
+  padding: 2px;
+  font-size: 1em;
+}
+
+textarea {
+  padding: 2px;
+  font-size: 1em;
 }
 
 input:focus::placeholder, 

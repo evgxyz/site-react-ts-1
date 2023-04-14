@@ -1,5 +1,5 @@
 @charset "UTF-8";
-body {
+* {
   font-family: Roboto, sans-serif;
 }
 
@@ -284,25 +284,45 @@ body {
 }
 
 .adm-products-item {
-  display: flex;
   padding: 10px;
   border: 1px solid gray;
   background-color: bisque;
-  column-gap: 10px;
 }
-.adm-products-item__body {
-  flex-basis: 50%;
-  flex-shrink: 1;
+.adm-products-item__table {
+  width: 100%;
+  border-collapse: collapse;
 }
-.adm-products-item__title {
-  font-weight: bold;
+.adm-products-item__table td {
+  padding: 5px;
+  vertical-align: top;
+  border: 1px solid gray;
 }
-.adm-products-item__price {
-  font-weight: bold;
+.adm-products-item__table td > div {
+  height: 1.2rem;
+  padding: 4px;
+}
+.adm-products-item__table td > input[type=text], .adm-products-item__table td > textarea {
+  margin: 0;
+  height: 1.2rem;
+  padding: 2px;
+  outline: none;
+}
+.adm-products-item__table td > textarea {
+  padding: 3px;
+}
+.adm-products-item__table td:first-child {
+  width: 10em;
+  text-align: right;
+}
+.adm-products-item__descr-div {
+  min-height: 5em;
+}
+.adm-products-item__descr-ta {
+  display: block;
+  min-height: 5em;
 }
 .adm-products-item__menu {
-  flex-grow: 1;
-  flex-shrink: 1;
+  margin-top: 10px;
 }
 
 .toggle-link {
@@ -319,6 +339,20 @@ body {
 }
 .toggle-link--expander.--expanded:after {
   content: "▴";
+}
+
+button {
+  font-size: 1em;
+}
+
+input[type=text] {
+  padding: 2px;
+  font-size: 1em;
+}
+
+textarea {
+  padding: 2px;
+  font-size: 1em;
 }
 
 input:focus::placeholder,
