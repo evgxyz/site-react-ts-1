@@ -47,7 +47,7 @@ export function ProductPage(props: TProductPageProps) {
 
   async function getProduct() {
     const product = await fetchProduct(productId);
-    setTimeout(() => setProduct(product), 500);
+    setProduct(product);
   }
 
   React.useEffect(() => {
@@ -156,16 +156,44 @@ export function CatalogProductCard(props: TProductCardProps) {
 // получение продукта
 export async function fetchProduct(productId: number)  {
   console.log('call fetchProduct, productId=' + productId); 
+  
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
+
   const productsAll: TProduct[] = 
-    (JSON.parse(localStorage.getItem('products') ?? 'null')) ?? [];
+    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
   const product = productsAll.find(pr => pr.id === productId) as TProduct;
   return product;
 }
 
 // получение всех продуктов
 export async function fetchProductsAll()  {
-  console.log('call fetchProductsAll'); 
+  console.log('call fetchProductsAll');
+  
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
+
   const productsAll: TProduct[] = 
-    (JSON.parse(localStorage.getItem('products') ?? 'null')) ?? [];
+    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
   return productsAll;
+}
+
+// запись продуктов
+export async function deleteProduct(productId: number)  {
+  console.log('call deleteProduct, productId=' + productId); 
+  
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
+
+  const productsAll: TProduct[] = 
+    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+  const index = productsAll.findIndex(pr => pr.id === productId);
+  if (index >= 0) {
+    productsAll.splice(index, 1);
+    localStorage.setItem('products', JSON.stringify(productsAll));
+    return true;
+  }
+  else {
+    return false;
+  }
 }

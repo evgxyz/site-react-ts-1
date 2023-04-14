@@ -262,17 +262,17 @@ body {
   color: blue;
 }
 
-.admin__title {
+.adminka__title {
   margin: 10px;
 }
 
-.admin-products__info {
+.adm-products__info {
   padding: 10px;
   border: 1px solid gray;
   border-left: none;
   border-right: none;
 }
-.admin-products__list {
+.adm-products__list {
   display: flex;
   flex-grow: 1;
   height: 100%;
@@ -281,28 +281,28 @@ body {
   row-gap: 10px;
   padding: 10px;
 }
-.admin-products__msg {
+.adm-products__msg {
   margin: 10px;
 }
 
-.admin-products-item {
+.adm-products-item {
   display: flex;
   padding: 10px;
   border: 1px solid gray;
   background-color: bisque;
   column-gap: 10px;
 }
-.admin-products-item__body {
+.adm-products-item__body {
   flex-basis: 50%;
   flex-shrink: 1;
 }
-.admin-products-item__title {
+.adm-products-item__title {
   font-weight: bold;
 }
-.admin-products-item__price {
+.adm-products-item__price {
   font-weight: bold;
 }
-.admin-products-item__menu {
+.adm-products-item__menu {
   flex-grow: 1;
   flex-shrink: 1;
 }

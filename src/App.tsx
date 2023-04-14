@@ -8,7 +8,7 @@ import {MainPage} from './units/MainPage'
 import {useBasketReducer, initBasket, Basket, BasketTray} from './units/Basket'
 import {Catalog} from './units/Catalog'
 import {ProductPage} from './units/Products'
-import {Admin} from './units/Admin'
+import {Adminka} from './units/Adminka'
 
 export function App() {
 
@@ -33,7 +33,7 @@ export function App() {
     } 
     break;
     case '#!admin': {
-      pageContent = <Admin />
+      pageContent = <Adminka />
     } 
     break;
     default: {
