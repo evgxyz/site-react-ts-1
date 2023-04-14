@@ -3,6 +3,9 @@ import React from 'react';
 import {useEnvControl} from './Env';
 import {useRouterControl} from './Router';
 import {TBasketControl, ProductBasketMenu} from './Basket';
+import {initProducts} from '../data/products';
+import {initProducers} from '../data/producers';
+import {initCategories} from '../data/categories';
 
 // продукт
 export interface TProduct {
@@ -196,4 +199,21 @@ export async function deleteProduct(productId: number)  {
   else {
     return false;
   }
+}
+
+/**********/
+
+// инициализация продуктов на "сервере"
+if( true || !localStorage.getItem('products') ) {
+  localStorage.setItem('products', JSON.stringify(initProducts));
+}
+
+// инициализация производителей на "сервере"
+if( true || !localStorage.getItem('producers') ) {
+  localStorage.setItem('producers', JSON.stringify(initProducers));
+}
+
+// инициализация категорий на "сервере"
+if( true || !localStorage.getItem('categories') ) {
+  localStorage.setItem('categories', JSON.stringify(initCategories));
 }

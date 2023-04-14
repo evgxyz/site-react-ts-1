@@ -6,9 +6,6 @@ import {useRouterControl} from './Router';
 import {useEnvControl} from './Env';
 import {TBasketControl} from './Basket';
 import {TProduct, TProducer, TCategory, CatalogProductCard} from './Products';
-import {initProducts} from '../data/products';
-import {initProducers} from '../data/producers';
-import {initCategories} from '../data/categories';
 
 interface TCatalogParams {
   priceFr: number,
@@ -718,21 +715,4 @@ async function fetchCategories() {
     (x, y) => compare(x.title, y.title) 
   );
   return categories;
-}
-
-/**********/
-
-// инициализация продуктов на "сервере"
-if( true || !localStorage.getItem('products') ) {
-  localStorage.setItem('products', JSON.stringify(initProducts));
-}
-
-// инициализация производителей на "сервере"
-if( true || !localStorage.getItem('producers') ) {
-  localStorage.setItem('producers', JSON.stringify(initProducers));
-}
-
-// инициализация категорий на "сервере"
-if( true || !localStorage.getItem('categories') ) {
-  localStorage.setItem('categories', JSON.stringify(initCategories));
 }

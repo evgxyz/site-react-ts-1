@@ -20,10 +20,9 @@ export interface TAdmProductsAction {
   args?: any
 }
 
-export type TAdmProductsControl = [
-  TAdmProducts,
-  React.Dispatch<TAdmProductsAction>
-]
+type TAdmProductsCallbacks = {
+  [funcname: string]: (arg?: any) => any
+}
 
 const defaultAdmProducts: TAdmProducts = {
   products: [],
@@ -89,6 +88,22 @@ export function Adminka() {
     updateAdmProducts();
   }, []);
 
+  // колбэк удаление продукта для меню
+  const delProduct = React.useCallback(async function (productId: number) {
+    // удаление на "сервере" с задержкой
+    const resOk = await deleteProduct(productId);
+    if (resOk) {
+      admProductsDispatch({type: AdmProductsActionType.DEL, args: productId})
+      return true;
+    } else {
+      return false;
+    }
+  }, [admProducts.products])
+
+  const admProductsCallbacks: TAdmProductsCallbacks = {
+    delProduct: delProduct
+  }
+
   return (
     <div className='adminka'>
       <h1 className='adminka__title'>Админка</h1>
@@ -105,7 +120,7 @@ export function Adminka() {
                     <AdmProductsItem 
                       key={product.id} 
                       product={product} 
-                      admProductsControl={[admProducts, admProductsDispatch]}
+                      admProductsCallbacks={admProductsCallbacks}
                     />
                   ))
                 }
@@ -123,7 +138,7 @@ export function Adminka() {
 // карточка продукта в админке
 export interface TAdmProductsItemProps {
   product: TProduct,
-  admProductsControl: TAdmProductsControl
+  admProductsCallbacks: TAdmProductsCallbacks
 }
 
 export function AdmProductsItem(props: TAdmProductsItemProps) {
@@ -160,7 +175,7 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
       <div className='adm-products-item__menu'>
         <AdmProductsItemMenu 
           productId={product.id}
-          admProductsControl={props.admProductsControl}
+          admProductsCallbacks={props.admProductsCallbacks}
         />
       </div>
     </div>
@@ -170,23 +185,29 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
 // меню продукта в админке
 export interface TAdmProductsItemMenuProps {
   productId: number,
-  admProductsControl: TAdmProductsControl
+  admProductsCallbacks: TAdmProductsCallbacks
 }
 
 export function AdmProductsItemMenu(props: TAdmProductsItemMenuProps) {
 
   const productId = props.productId;
-  const [admProducts, admProductsDispatch] = props.admProductsControl;
+  const {delProduct} = props.admProductsCallbacks;
+  const [delDisabled, setDelDisabled] = React.useState(false);
 
-  function delProduct() {
-    
+  async function delProductOnClick() {
+    setDelDisabled(true);
+    const resOK = await delProduct(productId);
+    if (!resOK) {
+      setDelDisabled(false);
+    }
   }
 
   return (
     <div className='adm-products-item-menu'>
       <div className='adm-products-item-menu__btns'>
         <button className='adm-products-item-menu__btn' 
-          onClick={delProduct}>x</button>
+          disabled={delDisabled}
+          onClick={delProductOnClick}>x</button>
       </div>
     </div>
   )
