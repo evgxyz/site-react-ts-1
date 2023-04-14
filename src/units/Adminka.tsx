@@ -88,7 +88,7 @@ export function Adminka() {
     updateAdmProducts();
   }, []);
 
-  // колбэк удаление продукта для меню
+  // колбэк удаления продукта для меню
   const delProduct = React.useCallback(async function (productId: number) {
     // удаление на "сервере" с задержкой
     const resOk = await deleteProduct(productId);

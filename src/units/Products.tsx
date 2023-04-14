@@ -1,5 +1,6 @@
 
 import React from 'react';
+import {compare} from './utils';
 import {useEnvControl} from './Env';
 import {useRouterControl} from './Router';
 import {TBasketControl, ProductBasketMenu} from './Basket';
@@ -199,6 +200,40 @@ export async function deleteProduct(productId: number)  {
   else {
     return false;
   }
+}
+
+// получение списка производителей с "сервера"
+export async function fetchProducers(query: string = '') {
+  console.log('call fetchProducers');
+
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 50)});
+
+  query = query.trim();
+  const producersAll: TProducer[] = 
+    (JSON.parse(String(localStorage.getItem('producers'))) ?? []);
+  const producers = producersAll.filter(x =>
+    x.title.toLowerCase().includes(query.toLowerCase())
+  )
+  .sort(
+    (x, y) => compare(x.title, y.title) 
+  );
+  return producers;
+}
+
+// получение списка категорий с "сервера"
+export async function fetchCategories() {
+  console.log('call fetchCategories');
+
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 500)});
+
+  const categoriesAll: TCategory[] = 
+    (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
+  const categories = categoriesAll.sort(
+    (x, y) => compare(x.title, y.title) 
+  );
+  return categories;
 }
 
 /**********/

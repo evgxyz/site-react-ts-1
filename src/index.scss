@@ -159,49 +159,55 @@ body {
   }
 }
 
-.filter__form {
-  button[type="submit"] {
-    width: 100%;
-  }
-}
-
-.filter__price {
-  margin-bottom: 5px;
-}
-
-.filter__producers {
-  margin-bottom: 5px;
-}
-
-.filter__producers-list {
-  margin: 0 auto;
-  padding-left: 0;
-
-  &.--expanded {
-    max-height: 100px;
-    overflow: auto; 
+.filter {
+  &__form {
+    button[type="submit"] {
+      width: 100%;
+    }
   }
 
-  & > li {
-    list-style-type: none;
-  }
-}
-
-.filter__categories {
-  margin-bottom: 10px;
-}
-
-.filter__categories-list {
-  margin: 0 auto;
-  padding-left: 0;
-
-  & > li {
-    list-style-type: none;
+  &__price {
+    margin-bottom: 5px;
   }
 
-  &.--expanded {
-    max-height: 100px;
-    overflow: auto; 
+  &__producers {
+    margin-bottom: 5px;
+  }
+
+  &__producers-query { 
+    margin-bottom: 5px;
+  }
+
+  &__producers-list {
+    margin: 0 auto;
+    padding-left: 0;
+
+    &.--expanded {
+      max-height: 100px;
+      overflow: auto; 
+    }
+
+    & > li {
+      list-style-type: none;
+    }
+  }
+
+  &__categories {
+    margin-bottom: 10px;
+  }
+
+  &__categories-list {
+    margin: 0 auto;
+    padding-left: 0;
+
+    & > li {
+      list-style-type: none;
+    }
+
+    &.--expanded {
+      max-height: 100px;
+      overflow: auto; 
+    }
   }
 }
 
@@ -211,7 +217,7 @@ body {
   flex-basis: 18rem;
   min-height: 13rem;
   border: 1px solid gray;  
-  background-color: bisque;
+  background-color: bisque; 
   padding: 10px;
   flex-direction: column;
   justify-content: space-between;

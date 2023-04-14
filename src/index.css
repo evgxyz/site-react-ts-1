@@ -116,15 +116,15 @@ body {
 .filter__form button[type=submit] {
   width: 100%;
 }
-
 .filter__price {
   margin-bottom: 5px;
 }
-
 .filter__producers {
   margin-bottom: 5px;
 }
-
+.filter__producers-query {
+  margin-bottom: 5px;
+}
 .filter__producers-list {
   margin: 0 auto;
   padding-left: 0;
@@ -136,11 +136,9 @@ body {
 .filter__producers-list > li {
   list-style-type: none;
 }
-
 .filter__categories {
   margin-bottom: 10px;
 }
-
 .filter__categories-list {
   margin: 0 auto;
   padding-left: 0;

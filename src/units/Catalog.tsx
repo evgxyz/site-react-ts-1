@@ -5,7 +5,11 @@ import {TStateControl} from './stateControl'
 import {useRouterControl} from './Router';
 import {useEnvControl} from './Env';
 import {TBasketControl} from './Basket';
-import {TProduct, TProducer, TCategory, CatalogProductCard} from './Products';
+import {
+  TProduct, TProducer, TCategory, 
+  fetchProducers, fetchCategories,
+  CatalogProductCard
+} from './Products';
 
 interface TCatalogParams {
   priceFr: number,
@@ -118,17 +122,16 @@ export function Catalog(props: TCatalogProps) {
         }
       }
 
-      const {products, totalPages} = await searchProducts(catalogParams, page);
-      setTimeout(() => {
-        setCatalogParams(cp => ({...cp, 
-          updateResultFlag: false,
-          resetPageFlag: false,
-        }));
-        setCatalogResult(cr => ({...cr, 
-          products: products,
-          totalPages: totalPages,
-        }));
-      }, 500);
+      const {products, totalPages} = await searchProducts(catalogParams, page); 
+
+      setCatalogParams(cp => ({...cp, 
+        updateResultFlag: false,
+        resetPageFlag: false,
+      }));
+      setCatalogResult(cr => ({...cr, 
+        products: products,
+        totalPages: totalPages,
+      }));
     }
   }, [catalogParams, page]);
   
@@ -397,7 +400,7 @@ function FilterProducers(props: TFilterProducersProps) {
 
   return (
     <>
-    <div>
+    <div className='filter__producers-query'>
       <input type='text' value={queryProducers} placeholder='Найти' 
         onChange={queryProducersOnChange} />
     </div>
@@ -496,7 +499,6 @@ function FilterCategories(props: TFilterCategoriesProps) {
   );
 }
 
-/**************************/
 // подфильтр по категориям
 interface THotCategoriesProps {
   catalogParamsControl: TCatalogParamsControl
@@ -619,11 +621,12 @@ function catalogParamsHashQuery(catalogParams: TCatalogParams) {
   return query;
 }
 
-/**********/
-
 // получение списка продкутов с "сервера"
 async function searchProducts(catalogParams: TCatalogParams, page: number = 1) {
   console.log('call searchProducts');
+
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 500)});
 
   const perPage = 6;
   page = Math.max(1, page);
@@ -691,28 +694,3 @@ async function searchProducts(catalogParams: TCatalogParams, page: number = 1) {
   };
 }
 
-// получение списка производителей с "сервера"
-async function fetchProducers(query: string = '') {
-  console.log('call fetchProducers');
-  query = query.trim();
-  const producersAll: TProducer[] = 
-    (JSON.parse(String(localStorage.getItem('producers'))) ?? []);
-  const producers = producersAll.filter(x =>
-    x.title.toLowerCase().includes(query.toLowerCase())
-  )
-  .sort(
-    (x, y) => compare(x.title, y.title) 
-  );
-  return producers;
-}
-
-// получение списка категорий с "сервера"
-async function fetchCategories() {
-  console.log('call fetchCategories');
-  const categoriesAll: TCategory[] = 
-    (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
-  const categories = categoriesAll.sort(
-    (x, y) => compare(x.title, y.title) 
-  );
-  return categories;
-}
