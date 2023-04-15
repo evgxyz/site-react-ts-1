@@ -14,7 +14,7 @@ export function Navline() {
 
   return (
     <nav className='navline'>
-      {navline}
+      {navline.map((el, i) => <span key={i}>{el}</span>)}
     </nav>
   );
 }

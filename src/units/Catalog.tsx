@@ -367,7 +367,8 @@ function FilterProducers(props: TFilterProducersProps) {
 
   // обработчик поля поиска
   function queryProducersOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
-    setQueryProducers(ev.currentTarget.value);
+    const query = ev.currentTarget.value;
+    setQueryProducers(query);
   }
 
   // обработчик чекбокса

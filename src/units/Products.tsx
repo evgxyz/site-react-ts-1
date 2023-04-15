@@ -182,9 +182,29 @@ export async function fetchProductsAll()  {
   return productsAll;
 }
 
-// запись продуктов
-export async function deleteProduct(productId: number)  {
-  console.log('call deleteProduct, productId=' + productId); 
+// редактирование продукта на "сервере"
+export async function dbEditProduct(productId: number, newProduct: TProduct)  {
+  console.log('call dbEditProduct, productId=' + productId); 
+  
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
+
+  const productsAll: TProduct[] = 
+    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+  const index = productsAll.findIndex(pr => pr.id === productId);
+  if (index >= 0) {
+    productsAll[index] = newProduct;
+    localStorage.setItem('products', JSON.stringify(productsAll));
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+// удаление продукта на "сервере"
+export async function dbDelProduct(productId: number)  {
+  console.log('call dbDelProduct, productId=' + productId); 
   
   //искусственная задержка
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});

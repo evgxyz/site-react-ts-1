@@ -312,6 +312,7 @@
 }
 .adm-products-item__table td:first-child {
   width: 10em;
+  padding: 7px;
   text-align: right;
 }
 .adm-products-item__descr-div {

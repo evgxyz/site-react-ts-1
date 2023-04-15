@@ -1,7 +1,13 @@
 
 import React from 'react';
+import {isIntStr, range, compare} from './utils';
 import {useEnvControl} from './Env';
-import {TProduct, fetchProductsAll, deleteProduct} from './Products';
+import {
+    TProduct, 
+    fetchProductsAll, 
+    dbEditProduct, 
+    dbDelProduct
+} from './Products';
 
 interface TAdmProducts {
   products: TProduct[],
@@ -21,7 +27,7 @@ export interface TAdmProductsAction {
 }
 
 type TAdmProductsCallbacks = {
-  [funcname: string]: (arg?: any) => any
+  [funcname: string]: (...arg: any[]) => Promise<any>
 }
 
 const defaultAdmProducts: TAdmProducts = {
@@ -31,6 +37,8 @@ const defaultAdmProducts: TAdmProducts = {
 
 function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsAction) {
   
+  console.log('call admProductsReducer, action:' + JSON.stringify(action))
+
   switch (action.type) {
 
     case AdmProductsActionType.INIT: {
@@ -39,6 +47,21 @@ function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsActio
         products: products,
         initFlag: true
       };
+    }
+
+    case AdmProductsActionType.EDIT: {
+      const [productId, newProduct] = action.args as [number, TProduct];
+      const products = admProducts.products;
+      const index = products.findIndex(pr => pr.id === productId);
+      if (index >= 0) {
+        products[index] = newProduct;
+        return {...admProducts, 
+          products: products
+        };
+      }
+      else {
+        return admProducts
+      }
     }
 
     case AdmProductsActionType.DEL: {
@@ -88,20 +111,37 @@ export function Adminka() {
     updateAdmProducts();
   }, []);
 
-  // колбэк удаления продукта для меню
-  const delProduct = React.useCallback(async function (productId: number) {
+  // колбэк для редактирования продукта
+  const editProduct = 
+    async function (productId: number, newProduct: TProduct) {  
+    // редактирование на "сервере" с задержкой
+    const resOk = await dbEditProduct(productId, newProduct);
+    if (resOk) {
+      admProductsDispatch({
+        type: AdmProductsActionType.EDIT, 
+        args: [productId, newProduct]
+      })
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  // колбэк удаления продукта
+  const delProduct = async function (productId: number) {
     // удаление на "сервере" с задержкой
-    const resOk = await deleteProduct(productId);
+    const resOk = await dbDelProduct(productId);
     if (resOk) {
       admProductsDispatch({type: AdmProductsActionType.DEL, args: productId})
       return true;
     } else {
       return false;
     }
-  }, [admProducts.products])
+  };
 
   const admProductsCallbacks: TAdmProductsCallbacks = {
-    delProduct: delProduct
+    editProduct,
+    delProduct
   }
 
   return (
@@ -144,22 +184,55 @@ export interface TAdmProductsItemProps {
 export function AdmProductsItem(props: TAdmProductsItemProps) {
 
   const product = props.product;
-  const {delProduct} = props.admProductsCallbacks;
+  const {editProduct, delProduct} = props.admProductsCallbacks;
+
+  const [busy, setBusy] = React.useState(false);
 
   const [editing, setEditing] = React.useState(false);
-  const [busy, setBusy] = React.useState(false);
+  const [newProduct, setNewProduct] = React.useState(() => ({...product}));
+  const [priceStr, setPriceStr] = React.useState(() => product.price.toString());
 
   function toggleEditOnClick() {
     setEditing(st => !st);
+    setPriceStr(product.price.toString());
   }
 
-  async function delProductOnClick() {
+  function editProductOnSubmit(ev: React.SyntheticEvent) {
+    ev.preventDefault(); 
+    console.log('call editProductOnSubmit')
+    setBusy(true);
+    editProduct(product.id, newProduct)
+      .then(() => {setEditing(false)})
+      .finally(() => setBusy(false));
+  }
+
+  function titleOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const title = ev.currentTarget.value;
+    setNewProduct(pr => ({...pr, title}));
+  }
+
+  function descriptionOnChange(ev: React.ChangeEvent<HTMLTextAreaElement>) {
+    const description = ev.currentTarget.value;
+    setNewProduct(pr => ({...pr, description}));
+  }
+
+  function priceOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const priceStr = ev.currentTarget.value.trim();
+    if (priceStr == '' || isIntStr(priceStr)) {
+      setPriceStr(priceStr);
+      let price = parseInt(priceStr);
+      if (!isFinite(price)) { 
+        price = 0;
+      }
+      setNewProduct(pr => ({...pr, price}));
+    } 
+  }
+
+  function delProductOnClick() {
     if (!confirm('Удалить?')) return;
     setBusy(true);
-    const resOK = await delProduct(product.id);
-    if (!resOK) {
-      setBusy(false);
-    }
+    delProduct(product.id)
+      .finally(() => setBusy(false));
   }
 
   return (
@@ -167,26 +240,31 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
       {
         editing ?
         <>
-          <form> 
+          <form onSubmit={editProductOnSubmit}> 
             <table className='adm-products-item__table'>
+            <tbody>
               <tr>
                 <td>id:</td>
                 <td><div>{product.id}</div></td>
               </tr>
               <tr>
                 <td>Название:</td>
-                <td><input type='text' value={product.title} /></td>
+                <td><input type='text' 
+                  value={newProduct.title} onChange={titleOnChange} /></td>
               </tr>
               <tr>
                 <td>Описание:</td>
                 <td>
-                  <textarea value={product.description} 
+                  <textarea 
+                    value={newProduct.description} 
+                    onChange={descriptionOnChange}
                     className='adm-products-item__descr-ta' />
                 </td>
               </tr>
               <tr>
                 <td>Цена:</td>
-                <td><input type='text' value={product.price} /></td>
+                <td><input type='text' 
+                  value={priceStr} onChange={priceOnChange} /></td>
               </tr>
               <tr>
                 <td>Производитель:</td>
@@ -200,20 +278,21 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
                 <td>Категории:</td>
                 <td><div>{product.categories.join(', ')}</div></td>
               </tr>
+            </tbody>
             </table>
             <div className='adm-products-item__menu'>
               <button className='adm-products-item__btn' 
                   disabled={busy}
                   onClick={toggleEditOnClick}>Отменить</button>
-              <button className='adm-products-item__btn' 
-                  disabled={busy}
-                  onClick={()=>1}>Сохранить</button>
+              <button type='submit' className='adm-products-item__btn' 
+                  disabled={busy}>Сохранить</button>
             </div>
           </form>
         </>
         :
         <> 
           <table className='adm-products-item__table'>
+          <tbody>
             <tr>
               <td>id:</td>
               <td><div>{product.id}</div></td>
@@ -246,6 +325,7 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
               <td>Категории:</td>
               <td><div>{product.categories.join(', ')}</div></td>
             </tr>
+          </tbody>
           </table>
           <div className='adm-products-item__menu'>
             <button className='adm-products-item__btn' 
