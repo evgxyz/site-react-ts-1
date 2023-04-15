@@ -1,7 +1,7 @@
 
 import {TCategory} from '../units/Products'
 
-export const initCategories: TCategory[] = [
+export const initCategoriesAll: TCategory[] = [
   {
     "id": 1,
     "title": "Уход за лицом",

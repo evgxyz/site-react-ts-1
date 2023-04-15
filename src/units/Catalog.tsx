@@ -123,7 +123,7 @@ export function Catalog(props: TCatalogProps) {
         }
       }
 
-      const {products, totalPages} = await searchProducts(catalogParams, page); 
+      const {products, totalPages} = await dbSearchProducts(catalogParams, page); 
 
       setCatalogParams(cp => ({...cp, 
         updateResultFlag: false,
@@ -628,8 +628,8 @@ function catalogParamsHashQuery(catalogParams: TCatalogParams) {
 }
 
 // получение списка продкутов с "сервера"
-async function searchProducts(catalogParams: TCatalogParams, page: number = 1) {
-  console.log('call searchProducts');
+async function dbSearchProducts(catalogParams: TCatalogParams, page: number = 1) {
+  console.log('call dbSearchProducts');
 
   //искусственная задержка
   await new Promise(resolve => {setTimeout(() => resolve(1), 500)});
@@ -672,7 +672,7 @@ async function searchProducts(catalogParams: TCatalogParams, page: number = 1) {
   }
 
   const productsAll: TProduct[] = 
-    JSON.parse(String(localStorage.getItem('products'))) ?? [];
+    JSON.parse(String(localStorage.getItem('productsAll'))) ?? [];
   const products = productsAll.filter(product => {
       return (
         // цена
@@ -692,8 +692,9 @@ async function searchProducts(catalogParams: TCatalogParams, page: number = 1) {
     })
     .sort(sortCompareFn); // сортировка результатов
   
-  const indexFrom = perPage*(page - 1);
+  const indexFrom = perPage * (page - 1);
   const indexTo = indexFrom + perPage;
+  
   return {
     products: products.slice(indexFrom, indexTo),
     totalPages: Math.ceil(products.length / perPage),

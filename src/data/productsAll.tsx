@@ -1,7 +1,7 @@
 
 import {TProduct} from '../units/Products'
 
-export const initProducts: TProduct[] = [
+export const initProductsAll: TProduct[] = [
   {
     "id": 1,
     "title": "Средство AOS", 

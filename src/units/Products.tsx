@@ -4,9 +4,9 @@ import {compare} from './utils';
 import {useEnvControl} from './Env';
 import {useRouterControl} from './Router';
 import {TBasketControl, ProductBasketMenu} from './Basket';
-import {initProducts} from '../data/products';
-import {initProducers} from '../data/producers';
-import {initCategories} from '../data/categories';
+import {initProductsAll} from '../data/productsAll';
+import {initProducersAll} from '../data/producersAll';
+import {initCategoriesAll} from '../data/categoriesAll';
 
 // продукт
 export interface TProduct {
@@ -176,7 +176,7 @@ export async function dbGetProduct(productId: number)  {
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
 
   const productsAll: TProduct[] = 
-    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+    JSON.parse(localStorage.getItem('productsAll') ?? 'null') ?? [];
   const product = productsAll.find(pr => pr.id === productId) as TProduct;
   return product;
 }
@@ -189,7 +189,7 @@ export async function dbGetProductsAll()  {
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
 
   const productsAll: TProduct[] = 
-    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+    JSON.parse(localStorage.getItem('productsAll') ?? 'null') ?? [];
   return productsAll;
 }
 
@@ -201,15 +201,15 @@ export async function dbAddProduct(newProduct: TProduct)  {
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
 
   const productsAll: TProduct[] = 
-    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+    JSON.parse(localStorage.getItem('productsAll') ?? 'null') ?? [];
 
   let insertId = 
-    (JSON.parse(localStorage.getItem('productsLastId') ?? 'null') ?? -1) + 1;
+    (JSON.parse(localStorage.getItem('productsAllLastId') ?? 'null') ?? -1) + 1;
 
   productsAll.push({...newProduct, id: insertId});
 
-  localStorage.setItem('products', JSON.stringify(productsAll));
-  localStorage.setItem('productsLastId', JSON.stringify(insertId));
+  localStorage.setItem('productsAll', JSON.stringify(productsAll));
+  localStorage.setItem('productsAllLastId', JSON.stringify(insertId));
 
   return [true, insertId];
 }
@@ -222,11 +222,11 @@ export async function dbEditProduct(newProduct: TProduct)  {
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
 
   const productsAll: TProduct[] = 
-    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+    JSON.parse(localStorage.getItem('productsAll') ?? 'null') ?? [];
   const index = productsAll.findIndex(pr => pr.id === newProduct.id);
   if (index >= 0) {
     productsAll[index] = newProduct;
-    localStorage.setItem('products', JSON.stringify(productsAll));
+    localStorage.setItem('productsAll', JSON.stringify(productsAll));
     return true;
   }
   else {
@@ -242,11 +242,11 @@ export async function dbDelProduct(productId: number)  {
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
 
   const productsAll: TProduct[] = 
-    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+    JSON.parse(localStorage.getItem('productsAll') ?? 'null') ?? [];
   const index = productsAll.findIndex(pr => pr.id === productId);
   if (index >= 0) {
     productsAll.splice(index, 1);
-    localStorage.setItem('products', JSON.stringify(productsAll));
+    localStorage.setItem('productsAll', JSON.stringify(productsAll));
     return true;
   }
   else {
@@ -263,7 +263,7 @@ export async function dbGetProducers(query: string = '') {
 
   query = query.trim();
   const producersAll: TProducer[] = 
-    (JSON.parse(String(localStorage.getItem('producers'))) ?? []);
+    (JSON.parse(String(localStorage.getItem('producersAll'))) ?? []);
   const producers = producersAll.filter(x =>
     x.title.toLowerCase().includes(query.toLowerCase())
   )
@@ -281,7 +281,7 @@ export async function dbGetCategories() {
   await new Promise(resolve => {setTimeout(() => resolve(1), 500)});
 
   const categoriesAll: TCategory[] = 
-    (JSON.parse(String(localStorage.getItem('categories'))) ?? [])
+    (JSON.parse(String(localStorage.getItem('categoriesAll'))) ?? [])
   const categories = categoriesAll.sort(
     (x, y) => compare(x.title, y.title) 
   );
@@ -291,18 +291,19 @@ export async function dbGetCategories() {
 /**********/
 
 // инициализация продуктов на "сервере"
-if ( !(localStorage.getItem('products') && localStorage.getItem('productsLastId')) ) {
-  const lastId = initProducts.reduce((maxId, pr) => Math.max(maxId, pr.id), 0);
-  localStorage.setItem('products', JSON.stringify(initProducts));
-  localStorage.setItem('productsLastId', JSON.stringify(lastId));
+if ( !( localStorage.getItem('productsAll') && 
+        localStorage.getItem('productsAllLastId') ) ) {
+  const lastId = initProductsAll.reduce((maxId, pr) => Math.max(maxId, pr.id), 0);
+  localStorage.setItem('productsAll', JSON.stringify(initProductsAll));
+  localStorage.setItem('productsAllLastId', JSON.stringify(lastId));
 }
 
 // инициализация производителей на "сервере"
-if ( true || !localStorage.getItem('producers') ) {
-  localStorage.setItem('producers', JSON.stringify(initProducers));
+if ( true || !localStorage.getItem('producersAll') ) {
+  localStorage.setItem('producersAll', JSON.stringify(initProducersAll));
 }
 
 // инициализация категорий на "сервере"
-if ( true || !localStorage.getItem('categories') ) {
-  localStorage.setItem('categories', JSON.stringify(initCategories));
+if ( true || !localStorage.getItem('categoriesAll') ) {
+  localStorage.setItem('categoriesAll', JSON.stringify(initCategoriesAll));
 }

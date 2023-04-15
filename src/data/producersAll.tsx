@@ -1,7 +1,7 @@
 
 import {TProducer} from '../units/Products'
 
-export const initProducers: TProducer[] = [
+export const initProducersAll: TProducer[] = [
   {
     "id": 1,
     "title": "Vanish"
