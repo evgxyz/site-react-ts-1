@@ -334,13 +334,17 @@ function FilterPrice(props: TFilterPriceProps) {
   }
 
   return (
-    <>
-    <input type='text' value={priceFr} onChange={priceFrOnChange} 
-      placeholder='От' style={{width: '5em'}} /> 
-    {' – '}
-    <input type='text' value={priceTo} onChange={priceToOnChange} 
-      placeholder='До' style={{width: '5em'}}/>
-    </>
+    <div className='filter__price-box'>
+      <input type='text' 
+        value={priceFr} 
+        onChange={priceFrOnChange} 
+        placeholder='От' /> 
+      {' – '} 
+      <input type='text' 
+        value={priceTo} 
+        onChange={priceToOnChange} 
+        placeholder='До' />
+    </div>
   )
 }
 

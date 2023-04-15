@@ -119,6 +119,16 @@
 .filter__price {
   margin-bottom: 5px;
 }
+.filter__price-box {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  column-gap: 5px;
+}
+.filter__price-box input[type=text] {
+  max-width: 5em;
+}
 .filter__producers {
   margin-bottom: 5px;
 }
@@ -326,6 +336,10 @@
   margin-top: 10px;
 }
 
+.nobr {
+  word-wrap: none;
+}
+
 .toggle-link {
   font-size: 0.9em;
   color: green;
@@ -352,6 +366,11 @@ input[type=text] {
 }
 
 textarea {
+  padding: 2px;
+  font-size: 1em;
+}
+
+select {
   padding: 2px;
   font-size: 1em;
 }

@@ -285,57 +285,62 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
       {
         editing ?
         <>
-          <form onSubmit={editProductOnSubmit}> 
-            <table className='adm-products-item__table'>
-            <tbody>
-              <tr>
-                <td>id:</td>
-                <td><div>{product.id}</div></td>
-              </tr>
-              <tr>
-                <td>Название:</td>
-                <td>
-                  <input type='text' 
-                    value={tmpProduct.title} 
-                    onChange={titleOnChange} />
-                  </td>
-              </tr>
-              <tr>
-                <td>Описание:</td>
-                <td>
-                  <textarea 
-                    value={tmpProduct.description} 
-                    onChange={descrOnChange}
-                    className='adm-products-item__descr-ta' />
+        <form onSubmit={editProductOnSubmit}> 
+          <table className='adm-products-item__table'>
+          <tbody>
+            <tr>
+              <td>id:</td>
+              <td><div>{product.id}</div></td>
+            </tr>
+            <tr>
+              <td>Название:</td>
+              <td>
+                <input type='text' 
+                  value={tmpProduct.title} 
+                  onChange={titleOnChange} />
                 </td>
-              </tr>
-              <tr>
-                <td>Цена:</td>
-                <td>
-                  <input type='text' 
-                    value={tmpProduct.priceStr} 
-                    onChange={priceOnChange} />
-                </td>
-              </tr>
-              <tr>
-                <td>Производитель:</td>
-                <td>
-                  <input type='text' 
-                    value={tmpProduct.producer} 
-                    onChange={producerOnChange} />
-                </td>
-              </tr>
-              <tr>
-                <td>Штрихкод:</td>
-                <td>
-                  <input type='text' 
-                    value={tmpProduct.code} 
-                    onChange={codeOnChange} />
-                </td>
-              </tr>
-              <tr>
-                <td>Категории:</td>
-                <td>
+            </tr>
+            <tr>
+              <td>Описание:</td>
+              <td>
+                <textarea 
+                  value={tmpProduct.description} 
+                  onChange={descrOnChange}
+                  className='adm-products-item__descr-ta' />
+              </td>
+            </tr>
+            <tr>
+              <td>Цена:</td>
+              <td>
+                <input type='text' 
+                  value={tmpProduct.priceStr} 
+                  onChange={priceOnChange} />
+              </td>
+            </tr>
+            <tr>
+              <td>Производитель:</td>
+              <td>
+                <input type='text' 
+                  value={tmpProduct.producer} 
+                  onChange={producerOnChange} />
+              </td>
+            </tr>
+            <tr>
+              <td>Штрихкод:</td>
+              <td>
+                <input type='text' 
+                  value={tmpProduct.code} 
+                  onChange={codeOnChange} />
+              </td>
+            </tr>
+            <tr>
+              <td>Категории:</td>
+              <td>
+                {
+                  tmpCategories.length == 0 ?
+                  <span>Загрузка...</span>
+                  :
+                  <>
                   <div>
                     {
                       tmpCategories
@@ -359,18 +364,20 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
                       )
                     }
                   </select>
-                </td>
-              </tr>
-            </tbody>
-            </table>
-            <div className='adm-products-item__menu'>
-              <button className='adm-products-item__btn' 
-                disabled={busy}
-                onClick={toggleEditOnClick}>Отменить</button>
-              <button type='submit' className='adm-products-item__btn' 
-                disabled={busy}>Сохранить</button>
-            </div>
-          </form>
+                  </>
+                }
+              </td>
+            </tr>
+          </tbody>
+          </table>
+          <div className='adm-products-item__menu'>
+            <button className='adm-products-item__btn' 
+              disabled={busy}
+              onClick={toggleEditOnClick}>Отменить</button>
+            <button type='submit' className='adm-products-item__btn' 
+              disabled={busy}>Сохранить</button>
+          </div>
+        </form>
         </>
         :
         <> 
