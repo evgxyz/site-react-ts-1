@@ -358,6 +358,10 @@
 }
 
 .adm-products {
+  &__add-form {
+    padding: 10px;
+  }
+
   &__info {
     padding: 10px;
     border: 1px solid gray; 
@@ -384,53 +388,6 @@
   padding: 10px;
   border: 1px solid gray;  
   background-color: bisque;
-
-  &__table {
-    width: 100%;
-    border-collapse: collapse;
-
-    td {
-      padding: 5px;
-      vertical-align: top;
-      border: 1px solid gray;  
-
-      & > div {
-        height: 1.2rem;
-        padding: 4px;
-      }
-
-      & > input[type="text"],
-      & > textarea {
-        margin: 0;
-        height: 1.2rem;
-        padding: 2px;
-        outline: none;
-      }
-
-      & > textarea {
-        padding: 3px;
-      }
-    }
-
-    td:first-child {
-      width: 10em;
-      padding: 7px;
-      text-align: right;
-    }
-  }
-
-  &__descr-div {
-    min-height: 5em; 
-  }
-
-  &__descr-ta {
-    display: block;
-    min-height: 5em;
-  }
-
-  &__menu {
-    margin-top: 10px;
-  }
 }
 
 .product-form {

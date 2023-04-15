@@ -110,7 +110,6 @@ export function Adminka() {
 
   async function updateAdmProducts() {
     const products = await dbGetProductsAll();
-    //products.sort((prX, prY) => -compare(prX.id, prY.id));
     admProductsDispatch({type: AdmProductsActionType.INIT, args: products})
   }
 
@@ -134,7 +133,7 @@ export function Adminka() {
       admProductsDispatch({
         type: AdmProductsActionType.ADD, 
         args: {...newProduct, id: insertId}
-      })
+      });
       return true;
     } else {
       return false;
@@ -179,9 +178,6 @@ export function Adminka() {
     <div className='adminka'>
       <h1 className='adminka__title'>Админка</h1>
       <div className='adminka__content'>
-        <div className='adm-products__add-form'>
-          <AddProductForm admProductsCallbacks={admProductsCallbacks} />
-        </div>
         {
           admProducts.initFlag ? 
             <div className='adm-products'>
@@ -191,7 +187,7 @@ export function Adminka() {
               <div className='adm-products__list'>
                 {
                   admProducts.products
-                    .sort((prX, prY) => -compare(prX.id, prY.id))
+                    .sort((prX, prY) => compare(prX.id, prY.id))
                     .map(product => (
                     <AdmProductsItem 
                       key={product.id} 
@@ -206,6 +202,9 @@ export function Adminka() {
               <b>Загрузка...</b>
             </div>
         }
+        <div className='adm-products__add-form'>
+          <AddProductForm admProductsCallbacks={admProductsCallbacks} />
+        </div>
       </div>
     </div>
   );
@@ -317,12 +316,12 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
   }
 
   return (
-    <div className='adm-products-item'>
+    <div data-id={product.id} className='adm-products-item'>
       {
         editing ?
           <>
           <form onSubmit={editProductOnSubmit}> 
-            <table className='adm-products-item__table'>
+            <table className='product-form__table'>
             <tbody>
               <tr>
                 <td>id:</td>
@@ -342,7 +341,7 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
                   <textarea 
                     value={tmpProduct.description} 
                     onChange={descrOnChange}
-                    className='adm-products-item__descr-ta' />
+                    className='product-form__descr-ta' />
                 </td>
               </tr>
               <tr>
@@ -406,18 +405,18 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
               </tr>
             </tbody>
             </table>
-            <div className='adm-products-item__menu'>
-              <button className='adm-products-item__btn' 
+            <div className='product-form__menu'>
+              <button className='product-form__btn' 
                 disabled={busy}
                 onClick={toggleEditOnClick}>Отменить</button>
-              <button type='submit' className='adm-products-item__btn' 
+              <button type='submit' className='product-form__btn' 
                 disabled={busy}>Сохранить</button>
             </div>
           </form>
           </>
         :
           <> 
-            <table className='adm-products-item__table'>
+            <table className='product-form__table'>
             <tbody>
               <tr>
                 <td>id:</td>
@@ -430,7 +429,7 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
               <tr>
                 <td>Описание:</td>
                 <td>
-                  <div className='adm-products-item__descr-div'>
+                  <div className='product-form__descr-div'>
                     {product.description}
                   </div>
                 </td>
@@ -457,11 +456,11 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
               </tr>
             </tbody>
             </table>
-            <div className='adm-products-item__menu'>
-              <button className='adm-products-item__btn' 
+            <div className='product-form__menu'>
+              <button className='product-form__btn' 
                   disabled={busy}
                   onClick={toggleEditOnClick}>Изменить</button>
-              <button className='adm-products-item__btn' 
+              <button className='product-form__btn' 
                   disabled={busy}
                   onClick={delProductOnClick}>Удалить</button>
             </div>
