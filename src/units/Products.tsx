@@ -223,8 +223,8 @@ export async function dbDelProduct(productId: number)  {
 }
 
 // получение списка производителей с "сервера"
-export async function fetchProducers(query: string = '') {
-  console.log('call fetchProducers');
+export async function dbGetProducers(query: string = '') {
+  console.log('call dbGetProducers');
 
   //искусственная задержка
   await new Promise(resolve => {setTimeout(() => resolve(1), 50)});
@@ -242,8 +242,8 @@ export async function fetchProducers(query: string = '') {
 }
 
 // получение списка категорий с "сервера"
-export async function fetchCategories() {
-  console.log('call fetchCategories');
+export async function dbGetCategories() {
+  console.log('call dbGetCategories');
 
   //искусственная задержка
   await new Promise(resolve => {setTimeout(() => resolve(1), 500)});

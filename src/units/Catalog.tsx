@@ -7,7 +7,7 @@ import {useEnvControl} from './Env';
 import {TBasketControl} from './Basket';
 import {
   TProduct, TProducer, TCategory, 
-  fetchProducers, fetchCategories,
+  dbGetProducers, dbGetCategories,
   CatalogProductCard
 } from './Products';
 
@@ -108,6 +108,7 @@ export function Catalog(props: TCatalogProps) {
   const [catalogParams, setCatalogParams] = React.useState(defaultCatalogParams);
   const [catalogResult, setCatalogResult] = React.useState(defaultCatalogResult);
 
+  // обновление результатов поиска
   const updateCatalogResult = React.useCallback(async function () {
     
     if (catalogParams.updateResultFlag && catalogParams.initFlag) {
@@ -135,17 +136,18 @@ export function Catalog(props: TCatalogProps) {
     }
   }, [catalogParams, page]);
   
+  // инициализация параметров фильтра
   async function initCatalogParams() {
     console.log('call initCatalog');
 
     // производители
-    const producersAll = await fetchProducers();
+    const producersAll = await dbGetProducers();
     const producers = producersAll.map(pr => 
       ({...pr, checked: producerIds.includes(pr.id)})
     );
 
     // категории
-    const categoriesAll = await fetchCategories();
+    const categoriesAll = await dbGetCategories();
     const categories = categoriesAll.map(ct => 
       ({...ct, checked: categoryIds.includes(ct.id)})
     );
@@ -342,7 +344,6 @@ function FilterPrice(props: TFilterPriceProps) {
   )
 }
 
-/**************************/
 // подфильтр по производителю
 interface TFilterProducersProps {
   catalogParamsControl: TCatalogParamsControl
@@ -355,9 +356,9 @@ function FilterProducers(props: TFilterProducersProps) {
   const [queryProducers, setQueryProducers] = React.useState('');
   const [producerIds, setProducerIds] = React.useState([] as number[]);
 
-  // получение списка производителей 
+  // обновление списка производителей подходящих под запрос
   const updateProducerIds = React.useCallback(async function () {
-    const producers = await fetchProducers(queryProducers);
+    const producers = await dbGetProducers(queryProducers);
     const newProducerIds = producers.map(pr => pr.id);
     setProducerIds(newProducerIds);
   }, [queryProducers]);

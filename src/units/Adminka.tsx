@@ -189,9 +189,11 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
   const [busy, setBusy] = React.useState(false);
 
   const [editing, setEditing] = React.useState(false);
-  const [tmpProduct, setTmpProduct] = React.useState(() => 
-    ({...product, priceStr: product.price.toString()}));
+  const [tmpProduct, setTmpProduct] = React.useState( 
+    () => ({...product, priceStr: product.price.toString()})
+  );
 
+  // изменение продукта
   function toggleEditOnClick() {
     setEditing(st => !st);
     setTmpProduct({...product, priceStr: product.price.toString()})
@@ -213,7 +215,7 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
     setTmpProduct(pr => ({...pr, title}));
   }
 
-  function descriptionOnChange(ev: React.ChangeEvent<HTMLTextAreaElement>) {
+  function descrOnChange(ev: React.ChangeEvent<HTMLTextAreaElement>) {
     const description = ev.currentTarget.value;
     setTmpProduct(pr => ({...pr, description}));
   }
@@ -229,6 +231,17 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
     } 
   }
 
+  function producerOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const producer = ev.currentTarget.value;
+    setTmpProduct(pr => ({...pr, producer}));
+  }
+
+  function codeOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const code = ev.currentTarget.value;
+    setTmpProduct(pr => ({...pr, code}));
+  }
+
+  // удаление продукта
   function delProductOnClick() {
     if (!confirm('Удалить?')) return;
     setBusy(true);
@@ -258,7 +271,7 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
                 <td>
                   <textarea 
                     value={tmpProduct.description} 
-                    onChange={descriptionOnChange}
+                    onChange={descrOnChange}
                     className='adm-products-item__descr-ta' />
                 </td>
               </tr>
@@ -269,11 +282,13 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
               </tr>
               <tr>
                 <td>Производитель:</td>
-                <td><input type='text' value={tmpProduct.producer} /></td>
+                <td><input type='text' 
+                  value={tmpProduct.producer} onChange={producerOnChange} /></td>
               </tr>
               <tr>
                 <td>Штрихкод:</td>
-                <td><input type='text' value={tmpProduct.code} /></td>
+                <td><input type='text' 
+                  value={tmpProduct.code} onChange={codeOnChange} /></td>
               </tr>
               <tr>
                 <td>Категории:</td>
