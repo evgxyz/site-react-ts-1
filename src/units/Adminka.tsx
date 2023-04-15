@@ -37,8 +37,6 @@ const defaultAdmProducts: TAdmProducts = {
 
 function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsAction) {
   
-  console.log('call admProductsReducer, action:' + JSON.stringify(action))
-
   switch (action.type) {
 
     case AdmProductsActionType.INIT: {
@@ -50,9 +48,9 @@ function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsActio
     }
 
     case AdmProductsActionType.EDIT: {
-      const [productId, newProduct] = action.args as [number, TProduct];
+      const newProduct = action.args as TProduct;
       const products = admProducts.products;
-      const index = products.findIndex(pr => pr.id === productId);
+      const index = products.findIndex(pr => pr.id === newProduct.id);
       if (index >= 0) {
         products[index] = newProduct;
         return {...admProducts, 
@@ -113,13 +111,13 @@ export function Adminka() {
 
   // колбэк для редактирования продукта
   const editProduct = 
-    async function (productId: number, newProduct: TProduct) {  
+    async function (newProduct: TProduct) {  
     // редактирование на "сервере" с задержкой
-    const resOk = await dbEditProduct(productId, newProduct);
+    const resOk = await dbEditProduct(newProduct);
     if (resOk) {
       admProductsDispatch({
         type: AdmProductsActionType.EDIT, 
-        args: [productId, newProduct]
+        args: newProduct
       })
       return true;
     } else {
@@ -205,7 +203,7 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
     setBusy(true);
     const newProduct = 
       pickobj(tmpProduct, Object.keys(product) as (keyof TProduct)[]);
-    editProduct(product.id, newProduct)
+    editProduct(newProduct)
       .then(() => {setEditing(false)})
       .finally(() => setBusy(false));
   }
