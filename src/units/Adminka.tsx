@@ -3,8 +3,8 @@ import React from 'react';
 import {isIntStr, pickobj} from './utils';
 import {useEnvControl} from './Env';
 import {
-    TProduct, 
-    fetchProductsAll, 
+    TProduct, TCategory,
+    fetchProductsAll, dbGetCategories,
     dbEditProduct, 
     dbDelProduct
 } from './Products';
@@ -14,14 +14,14 @@ interface TAdmProducts {
   initFlag: boolean,
 }
 
-export enum AdmProductsActionType { 
+enum AdmProductsActionType { 
   INIT = 'INIT',
   ADD = 'ADD', 
   EDIT = 'EDIT', 
   DEL = 'DEL',
 }
 
-export interface TAdmProductsAction {
+interface TAdmProductsAction {
   type: AdmProductsActionType,
   args?: any
 }
@@ -34,6 +34,8 @@ const defaultAdmProducts: TAdmProducts = {
   products: [],
   initFlag: false,
 }
+
+const defaultTmpCategories: (TCategory & {checked: boolean})[] = [];
 
 function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsAction) {
   
@@ -174,12 +176,12 @@ export function Adminka() {
 }
 
 // карточка продукта в админке
-export interface TAdmProductsItemProps {
+interface TAdmProductsItemProps {
   product: TProduct,
   admProductsCallbacks: TAdmProductsCallbacks
 }
 
-export function AdmProductsItem(props: TAdmProductsItemProps) {
+function AdmProductsItem(props: TAdmProductsItemProps) {
 
   const product = props.product;
   const {editProduct, delProduct} = props.admProductsCallbacks;
@@ -187,25 +189,29 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
   const [busy, setBusy] = React.useState(false);
 
   const [editing, setEditing] = React.useState(false);
+  const [tmpCategories, setTmpCategories] = React.useState(defaultTmpCategories);
   const [tmpProduct, setTmpProduct] = React.useState( 
     () => ({...product, priceStr: product.price.toString()})
   );
+
+  async function initEditing() {
+    const categoriesAll = await dbGetCategories();
+    const tmpCategories = categoriesAll.map(ct => 
+      ({...ct, checked: product.categories.includes(ct.title)})
+    );
+    setTmpCategories(tmpCategories);
+  }
+
+  React.useEffect(() => {
+    if (editing) {
+      initEditing();
+    }
+  }, [editing]);
 
   // изменение продукта
   function toggleEditOnClick() {
     setEditing(st => !st);
     setTmpProduct({...product, priceStr: product.price.toString()})
-  }
-
-  function editProductOnSubmit(ev: React.SyntheticEvent) {
-    ev.preventDefault(); 
-    console.log('call editProductOnSubmit')
-    setBusy(true);
-    const newProduct = 
-      pickobj(tmpProduct, Object.keys(product) as (keyof TProduct)[]);
-    editProduct(newProduct)
-      .then(() => {setEditing(false)})
-      .finally(() => setBusy(false));
   }
 
   function titleOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
@@ -239,6 +245,33 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
     setTmpProduct(pr => ({...pr, code}));
   }
 
+  function categoriesOnChange(ev: React.ChangeEvent<HTMLSelectElement>) {
+    ev.preventDefault();
+    if (ev.currentTarget.selectedOptions) {
+      const values = Array.from(
+        ev.currentTarget.selectedOptions, 
+        opt => parseInt(opt.value)
+      );
+      const newTmpCategories = tmpCategories.map(ct => 
+        ({...ct, checked: values.includes(ct.id)})
+      );
+      setTmpCategories(newTmpCategories);
+    }
+  }
+
+  function editProductOnSubmit(ev: React.SyntheticEvent) {
+    ev.preventDefault(); 
+    console.log('call editProductOnSubmit')
+    setBusy(true);
+    const newProduct = 
+      pickobj(tmpProduct, Object.keys(product) as (keyof TProduct)[]);
+    const newCategories = tmpCategories.filter(ct => ct.checked).map(ct => ct.title);
+    newProduct.categories = newCategories;
+    editProduct(newProduct)
+      .then(() => {setEditing(false)})
+      .finally(() => setBusy(false));
+  }
+
   // удаление продукта
   function delProductOnClick() {
     if (!confirm('Удалить?')) return;
@@ -261,8 +294,11 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
               </tr>
               <tr>
                 <td>Название:</td>
-                <td><input type='text' 
-                  value={tmpProduct.title} onChange={titleOnChange} /></td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.title} 
+                    onChange={titleOnChange} />
+                  </td>
               </tr>
               <tr>
                 <td>Описание:</td>
@@ -275,31 +311,64 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
               </tr>
               <tr>
                 <td>Цена:</td>
-                <td><input type='text' 
-                  value={tmpProduct.priceStr} onChange={priceOnChange} /></td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.priceStr} 
+                    onChange={priceOnChange} />
+                </td>
               </tr>
               <tr>
                 <td>Производитель:</td>
-                <td><input type='text' 
-                  value={tmpProduct.producer} onChange={producerOnChange} /></td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.producer} 
+                    onChange={producerOnChange} />
+                </td>
               </tr>
               <tr>
                 <td>Штрихкод:</td>
-                <td><input type='text' 
-                  value={tmpProduct.code} onChange={codeOnChange} /></td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.code} 
+                    onChange={codeOnChange} />
+                </td>
               </tr>
               <tr>
                 <td>Категории:</td>
-                <td><div>{tmpProduct.categories.join(', ')}</div></td>
+                <td>
+                  <div>
+                    {
+                      tmpCategories
+                        .filter(ct => ct.checked)
+                        .map(ct => ct.title).join(', ')
+                    }
+                  </div>
+                  <select multiple={true}
+                    value={
+                      tmpCategories
+                        .filter(ct => ct.checked)
+                        .map(ct => ct.id.toString())
+                    } 
+                    onChange={categoriesOnChange}
+                  >
+                    {
+                      tmpCategories.map(ct => 
+                        <option key={ct.id} value={ct.id.toString()}>
+                          {ct.title}
+                        </option>
+                      )
+                    }
+                  </select>
+                </td>
               </tr>
             </tbody>
             </table>
             <div className='adm-products-item__menu'>
               <button className='adm-products-item__btn' 
-                  disabled={busy}
-                  onClick={toggleEditOnClick}>Отменить</button>
+                disabled={busy}
+                onClick={toggleEditOnClick}>Отменить</button>
               <button type='submit' className='adm-products-item__btn' 
-                  disabled={busy}>Сохранить</button>
+                disabled={busy}>Сохранить</button>
             </div>
           </form>
         </>
@@ -337,7 +406,11 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
             </tr>
             <tr>
               <td>Категории:</td>
-              <td><div>{product.categories.join(', ')}</div></td>
+              <td>
+                <div>
+                  { product.categories.sort().join(', ') }
+                </div>
+              </td>
             </tr>
           </tbody>
           </table>
@@ -356,12 +429,12 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
 }
 
 // меню продукта в админке
-export interface TAdmProductsItemMenuProps {
+interface TAdmProductsItemMenuProps {
   productId: number,
   admProductsCallbacks: TAdmProductsCallbacks
 }
 
-export function AdmProductsItemMenu(props: TAdmProductsItemMenuProps) {
+function AdmProductsItemMenu(props: TAdmProductsItemMenuProps) {
 
   const productId = props.productId;
   const {delProduct} = props.admProductsCallbacks;
