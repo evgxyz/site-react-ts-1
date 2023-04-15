@@ -1,10 +1,12 @@
 
-import React from 'react';
-import {isIntStr, pickobj} from './utils';
+import React, { useEffect } from 'react';
+import {isIntStr, pickobj, compare} from './utils';
 import {useEnvControl} from './Env';
 import {
-    TProduct, TCategory,
-    fetchProductsAll, dbGetCategories,
+    TProduct, TCategory, templateProduct,
+    dbGetProductsAll, 
+    dbGetCategories,
+    dbAddProduct,
     dbEditProduct, 
     dbDelProduct
 } from './Products';
@@ -13,6 +15,9 @@ interface TAdmProducts {
   products: TProduct[],
   initFlag: boolean,
 }
+
+type TTmpCategory = TCategory & {checked: boolean}
+type TTmpProduct = TProduct & {priceStr: string}
 
 enum AdmProductsActionType { 
   INIT = 'INIT',
@@ -35,8 +40,14 @@ const defaultAdmProducts: TAdmProducts = {
   initFlag: false,
 }
 
-const defaultTmpCategories: (TCategory & {checked: boolean})[] = [];
+const defaultTmpCategories: TTmpCategory[] = [];
 
+const defaultTmpProduct: TTmpProduct = {
+  ...templateProduct,
+  priceStr: ''
+}
+
+// редусер для операций со списком товаров в админке
 function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsAction) {
   
   switch (action.type) {
@@ -47,6 +58,12 @@ function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsActio
         products: products,
         initFlag: true
       };
+    }
+
+    case AdmProductsActionType.ADD: {
+      const newProduct = action.args as TProduct;
+      admProducts.products.push(newProduct);
+      return {...admProducts};
     }
 
     case AdmProductsActionType.EDIT: {
@@ -79,16 +96,12 @@ function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsActio
       }
     }
 
-    case AdmProductsActionType.ADD: {
-      const product = action.args as TProduct;
-      return admProducts;
-    }
-
     default:
       return admProducts;
   }
 }
 
+// админка
 export function Adminka() {
 
   const [ , setEnv] = useEnvControl();
@@ -96,7 +109,8 @@ export function Adminka() {
     React.useReducer(admProductsReducer, defaultAdmProducts);
 
   async function updateAdmProducts() {
-    const products = await fetchProductsAll();
+    const products = await dbGetProductsAll();
+    //products.sort((prX, prY) => -compare(prX.id, prY.id));
     admProductsDispatch({type: AdmProductsActionType.INIT, args: products})
   }
 
@@ -110,6 +124,22 @@ export function Adminka() {
   React.useEffect(() => {
     updateAdmProducts();
   }, []);
+
+  // колбэк для добавления продукта
+  const addProduct = 
+    async function (newProduct: TProduct) {  
+    // добавление на "сервере" с задержкой
+    const [resOk, insertId] = await dbAddProduct(newProduct);
+    if (resOk) {
+      admProductsDispatch({
+        type: AdmProductsActionType.ADD, 
+        args: {...newProduct, id: insertId}
+      })
+      return true;
+    } else {
+      return false;
+    }
+  };
 
   // колбэк для редактирования продукта
   const editProduct = 
@@ -127,7 +157,7 @@ export function Adminka() {
     }
   };
 
-  // колбэк удаления продукта
+  // колбэк для удаления продукта
   const delProduct = async function (productId: number) {
     // удаление на "сервере" с задержкой
     const resOk = await dbDelProduct(productId);
@@ -140,6 +170,7 @@ export function Adminka() {
   };
 
   const admProductsCallbacks: TAdmProductsCallbacks = {
+    addProduct,
     editProduct,
     delProduct
   }
@@ -148,6 +179,9 @@ export function Adminka() {
     <div className='adminka'>
       <h1 className='adminka__title'>Админка</h1>
       <div className='adminka__content'>
+        <div className='adm-products__add-form'>
+          <AddProductForm admProductsCallbacks={admProductsCallbacks} />
+        </div>
         {
           admProducts.initFlag ? 
             <div className='adm-products'>
@@ -156,7 +190,9 @@ export function Adminka() {
               </div> 
               <div className='adm-products__list'>
                 {
-                  admProducts.products.map(product => (
+                  admProducts.products
+                    .sort((prX, prY) => -compare(prX.id, prY.id))
+                    .map(product => (
                     <AdmProductsItem 
                       key={product.id} 
                       product={product} 
@@ -191,7 +227,7 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
   const [editing, setEditing] = React.useState(false);
   const [tmpCategories, setTmpCategories] = React.useState(defaultTmpCategories);
   const [tmpProduct, setTmpProduct] = React.useState( 
-    () => ({...product, priceStr: product.price.toString()})
+    () => ({...product, priceStr: product.price.toString()} as TTmpProduct)
   );
 
   async function initEditing() {
@@ -284,184 +320,330 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
     <div className='adm-products-item'>
       {
         editing ?
-        <>
-        <form onSubmit={editProductOnSubmit}> 
-          <table className='adm-products-item__table'>
-          <tbody>
-            <tr>
-              <td>id:</td>
-              <td><div>{product.id}</div></td>
-            </tr>
-            <tr>
-              <td>Название:</td>
-              <td>
-                <input type='text' 
-                  value={tmpProduct.title} 
-                  onChange={titleOnChange} />
+          <>
+          <form onSubmit={editProductOnSubmit}> 
+            <table className='adm-products-item__table'>
+            <tbody>
+              <tr>
+                <td>id:</td>
+                <td><div>{product.id}</div></td>
+              </tr>
+              <tr>
+                <td>Название:</td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.title} 
+                    onChange={titleOnChange} />
+                  </td>
+              </tr>
+              <tr>
+                <td>Описание:</td>
+                <td>
+                  <textarea 
+                    value={tmpProduct.description} 
+                    onChange={descrOnChange}
+                    className='adm-products-item__descr-ta' />
                 </td>
-            </tr>
-            <tr>
-              <td>Описание:</td>
-              <td>
-                <textarea 
-                  value={tmpProduct.description} 
-                  onChange={descrOnChange}
-                  className='adm-products-item__descr-ta' />
-              </td>
-            </tr>
-            <tr>
-              <td>Цена:</td>
-              <td>
-                <input type='text' 
-                  value={tmpProduct.priceStr} 
-                  onChange={priceOnChange} />
-              </td>
-            </tr>
-            <tr>
-              <td>Производитель:</td>
-              <td>
-                <input type='text' 
-                  value={tmpProduct.producer} 
-                  onChange={producerOnChange} />
-              </td>
-            </tr>
-            <tr>
-              <td>Штрихкод:</td>
-              <td>
-                <input type='text' 
-                  value={tmpProduct.code} 
-                  onChange={codeOnChange} />
-              </td>
-            </tr>
-            <tr>
-              <td>Категории:</td>
-              <td>
-                {
-                  tmpCategories.length == 0 ?
-                  <span>Загрузка...</span>
-                  :
-                  <>
-                  <div>
-                    {
-                      tmpCategories
-                        .filter(ct => ct.checked)
-                        .map(ct => ct.title).join(', ')
-                    }
-                  </div>
-                  <select multiple={true}
-                    value={
-                      tmpCategories
-                        .filter(ct => ct.checked)
-                        .map(ct => ct.id.toString())
-                    } 
-                    onChange={categoriesOnChange}
-                  >
-                    {
-                      tmpCategories.map(ct => 
-                        <option key={ct.id} value={ct.id.toString()}>
-                          {ct.title}
-                        </option>
-                      )
-                    }
-                  </select>
-                  </>
-                }
-              </td>
-            </tr>
-          </tbody>
-          </table>
-          <div className='adm-products-item__menu'>
-            <button className='adm-products-item__btn' 
-              disabled={busy}
-              onClick={toggleEditOnClick}>Отменить</button>
-            <button type='submit' className='adm-products-item__btn' 
-              disabled={busy}>Сохранить</button>
-          </div>
-        </form>
-        </>
+              </tr>
+              <tr>
+                <td>Цена:</td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.priceStr} 
+                    onChange={priceOnChange} />
+                </td>
+              </tr>
+              <tr>
+                <td>Производитель:</td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.producer} 
+                    onChange={producerOnChange} />
+                </td>
+              </tr>
+              <tr>
+                <td>Штрихкод:</td>
+                <td>
+                  <input type='text' 
+                    value={tmpProduct.code} 
+                    onChange={codeOnChange} />
+                </td>
+              </tr>
+              <tr>
+                <td>Категории:</td>
+                <td>
+                  {
+                    tmpCategories.length == 0 ?
+                    <span>Загрузка...</span>
+                    :
+                    <>
+                    <div>
+                      {
+                        tmpCategories
+                          .filter(ct => ct.checked)
+                          .map(ct => ct.title).join(', ')
+                      }
+                    </div>
+                    <select multiple={true}
+                      value={
+                        tmpCategories
+                          .filter(ct => ct.checked)
+                          .map(ct => ct.id.toString())
+                      } 
+                      onChange={categoriesOnChange}
+                    >
+                      {
+                        tmpCategories.map(ct => 
+                          <option key={ct.id} value={ct.id.toString()}>
+                            {ct.title}
+                          </option>
+                        )
+                      }
+                    </select>
+                    </>
+                  }
+                </td>
+              </tr>
+            </tbody>
+            </table>
+            <div className='adm-products-item__menu'>
+              <button className='adm-products-item__btn' 
+                disabled={busy}
+                onClick={toggleEditOnClick}>Отменить</button>
+              <button type='submit' className='adm-products-item__btn' 
+                disabled={busy}>Сохранить</button>
+            </div>
+          </form>
+          </>
         :
-        <> 
-          <table className='adm-products-item__table'>
-          <tbody>
-            <tr>
-              <td>id:</td>
-              <td><div>{product.id}</div></td>
-            </tr>
-            <tr>
-              <td>Название:</td>
-              <td><div>{product.title}</div></td>
-            </tr>
-            <tr>
-              <td>Описание:</td>
-              <td>
-                <div className='adm-products-item__descr-div'>
-                  {product.description}
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>Цена:</td>
-              <td><div>{product.price}</div></td>
-            </tr>
-            <tr>
-              <td>Производитель:</td>
-              <td><div>{product.producer}</div></td>
-            </tr>
-            <tr>
-              <td>Штрихкод:</td>
-              <td><div>{product.code}</div></td>
-            </tr>
-            <tr>
-              <td>Категории:</td>
-              <td>
-                <div>
-                  { product.categories.sort().join(', ') }
-                </div>
-              </td>
-            </tr>
-          </tbody>
-          </table>
-          <div className='adm-products-item__menu'>
-            <button className='adm-products-item__btn' 
-                disabled={busy}
-                onClick={toggleEditOnClick}>Изменить</button>
-            <button className='adm-products-item__btn' 
-                disabled={busy}
-                onClick={delProductOnClick}>Удалить</button>
-          </div>
-        </>
+          <> 
+            <table className='adm-products-item__table'>
+            <tbody>
+              <tr>
+                <td>id:</td>
+                <td><div>{product.id}</div></td>
+              </tr>
+              <tr>
+                <td>Название:</td>
+                <td><div>{product.title}</div></td>
+              </tr>
+              <tr>
+                <td>Описание:</td>
+                <td>
+                  <div className='adm-products-item__descr-div'>
+                    {product.description}
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>Цена:</td>
+                <td><div>{product.price}</div></td>
+              </tr>
+              <tr>
+                <td>Производитель:</td>
+                <td><div>{product.producer}</div></td>
+              </tr>
+              <tr>
+                <td>Штрихкод:</td>
+                <td><div>{product.code}</div></td>
+              </tr>
+              <tr>
+                <td>Категории:</td>
+                <td>
+                  <div>
+                    { product.categories.sort().join(', ') }
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            </table>
+            <div className='adm-products-item__menu'>
+              <button className='adm-products-item__btn' 
+                  disabled={busy}
+                  onClick={toggleEditOnClick}>Изменить</button>
+              <button className='adm-products-item__btn' 
+                  disabled={busy}
+                  onClick={delProductOnClick}>Удалить</button>
+            </div>
+          </>
       }
     </div>
   );
 }
 
-// меню продукта в админке
-interface TAdmProductsItemMenuProps {
-  productId: number,
+// форма добавления продкукта
+interface TAddProductFormProps {
   admProductsCallbacks: TAdmProductsCallbacks
 }
 
-function AdmProductsItemMenu(props: TAdmProductsItemMenuProps) {
+function AddProductForm(props: TAddProductFormProps) {
 
-  const productId = props.productId;
-  const {delProduct} = props.admProductsCallbacks;
-  const [delDisabled, setDelDisabled] = React.useState(false);
+  const {addProduct} = props.admProductsCallbacks;
 
-  async function delProductOnClick() {
-    setDelDisabled(true);
-    const resOK = await delProduct(productId);
-    if (!resOK) {
-      setDelDisabled(false);
+  const [busy, setBusy] = React.useState(false);
+  const [tmpCategories, setTmpCategories] = React.useState(defaultTmpCategories);
+  const [tmpProduct, setTmpProduct] = React.useState(defaultTmpProduct);
+
+  async function initAddParams() {
+    const categoriesAll = await dbGetCategories();
+    const tmpCategories = categoriesAll.map(ct => ({...ct, checked: false}));
+    setTmpCategories(tmpCategories);
+  }
+
+  async function resetAddParams() {
+    setTmpProduct(defaultTmpProduct);
+    setTmpCategories(cts => cts.map(ct => ({...ct, checked: false})));
+  }
+
+  useEffect(() => {initAddParams()}, []);
+
+  function titleOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const title = ev.currentTarget.value;
+    setTmpProduct(pr => ({...pr, title}));
+  }
+
+  function descrOnChange(ev: React.ChangeEvent<HTMLTextAreaElement>) {
+    const description = ev.currentTarget.value;
+    setTmpProduct(pr => ({...pr, description}));
+  }
+
+  function priceOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const priceStr = ev.currentTarget.value.trim();
+    if (priceStr == '' || isIntStr(priceStr)) {
+      let price = parseInt(priceStr);
+      if (!isFinite(price)) { 
+        price = 0;
+      }
+      setTmpProduct(pr => ({...pr, price, priceStr}));
+    } 
+  }
+
+  function producerOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const producer = ev.currentTarget.value;
+    setTmpProduct(pr => ({...pr, producer}));
+  }
+
+  function codeOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
+    const code = ev.currentTarget.value;
+    setTmpProduct(pr => ({...pr, code}));
+  }
+
+  function categoriesOnChange(ev: React.ChangeEvent<HTMLSelectElement>) {
+    ev.preventDefault();
+    if (ev.currentTarget.selectedOptions) {
+      const values = Array.from(
+        ev.currentTarget.selectedOptions, 
+        opt => parseInt(opt.value)
+      );
+      const newTmpCategories = tmpCategories.map(ct => 
+        ({...ct, checked: values.includes(ct.id)})
+      );
+      setTmpCategories(newTmpCategories);
     }
   }
 
+  function addProductOnSubmit(ev: React.SyntheticEvent) {
+    ev.preventDefault(); 
+    console.log('call addProductOnSubmit')
+    setBusy(true);
+    const newProduct = 
+      pickobj(tmpProduct, Object.keys(templateProduct) as (keyof TProduct)[]);
+    const newCategories = tmpCategories.filter(ct => ct.checked).map(ct => ct.title);
+    newProduct.categories = newCategories;
+    addProduct(newProduct)
+      .then(() => {resetAddParams()})
+      .finally(() => setBusy(false));
+  }
+
   return (
-    <div className='adm-products-item-menu'>
-      <div className='adm-products-item-menu__btns'>
-        <button className='adm-products-item-menu__btn' 
-          disabled={delDisabled}
-          onClick={delProductOnClick}>x</button>
+    <>
+    <form onSubmit={addProductOnSubmit}> 
+      <table className='product-form__table'>
+      <tbody>
+        <tr>
+          <td>Название:</td>
+          <td>
+            <input type='text' 
+              value={tmpProduct.title} 
+              onChange={titleOnChange} />
+            </td>
+        </tr>
+        <tr>
+          <td>Описание:</td>
+          <td>
+            <textarea 
+              value={tmpProduct.description} 
+              onChange={descrOnChange}
+              className='product-form__descr-ta' />
+          </td>
+        </tr>
+        <tr>
+          <td>Цена:</td>
+          <td>
+            <input type='text' 
+              value={tmpProduct.priceStr} 
+              onChange={priceOnChange} />
+          </td>
+        </tr>
+        <tr>
+          <td>Производитель:</td>
+          <td>
+            <input type='text' 
+              value={tmpProduct.producer} 
+              onChange={producerOnChange} />
+          </td>
+        </tr>
+        <tr>
+          <td>Штрихкод:</td>
+          <td>
+            <input type='text' 
+              value={tmpProduct.code} 
+              onChange={codeOnChange} />
+          </td>
+        </tr>
+        <tr>
+          <td>Категории:</td>
+          <td>
+            {
+              tmpCategories.length == 0 ?
+                <span>Загрузка...</span>
+              :
+                <>
+                <div>
+                  {
+                    tmpCategories
+                      .filter(ct => ct.checked)
+                      .map(ct => ct.title).join(', ')
+                  }
+                </div>
+                <select multiple={true}
+                  value={
+                    tmpCategories
+                      .filter(ct => ct.checked)
+                      .map(ct => ct.id.toString())
+                  } 
+                  onChange={categoriesOnChange}
+                >
+                  {
+                    tmpCategories.map(ct => 
+                      <option key={ct.id} value={ct.id.toString()}>
+                        {ct.title}
+                      </option>
+                    )
+                  }
+                </select>
+                </>
+            }
+          </td>
+        </tr>
+      </tbody>
+      </table>
+      <div className='product-form__menu'>
+        <button type='submit' className='product-form__btn' 
+          disabled={busy}>Добавить</button>
       </div>
-    </div>
-  )
+    </form>
+    </>
+  );
 }
+

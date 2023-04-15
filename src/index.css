@@ -336,6 +336,49 @@
   margin-top: 10px;
 }
 
+.product-form {
+  padding: 10px;
+  border: 1px solid gray;
+  background-color: bisque;
+}
+.product-form__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.product-form__table td {
+  padding: 5px;
+  vertical-align: top;
+  border: 1px solid gray;
+}
+.product-form__table td > div {
+  height: 1.2rem;
+  padding: 4px;
+}
+.product-form__table td > input[type=text], .product-form__table td > textarea {
+  margin: 0;
+  height: 1.2rem;
+  padding: 2px;
+  outline: none;
+}
+.product-form__table td > textarea {
+  padding: 3px;
+}
+.product-form__table td:first-child {
+  width: 10em;
+  padding: 7px;
+  text-align: right;
+}
+.product-form__descr-div {
+  min-height: 5em;
+}
+.product-form__descr-ta {
+  display: block;
+  min-height: 5em;
+}
+.product-form__menu {
+  margin-top: 10px;
+}
+
 .nobr {
   word-wrap: none;
 }

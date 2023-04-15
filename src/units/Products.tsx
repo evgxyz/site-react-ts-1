@@ -32,6 +32,17 @@ export interface TCategory {
   rate: number,
 }
 
+// шаблон продукта
+export const templateProduct = {
+  id: 0,
+  title: '', 
+  price: 0,
+  description: '',
+  producer: '',
+  code: '',
+  categories: []
+}
+
 // страница продукта 
 export interface TProductPageProps {
   basketControl: TBasketControl
@@ -50,7 +61,7 @@ export function ProductPage(props: TProductPageProps) {
   const [product, setProduct] = React.useState({} as TProduct);
 
   async function getProduct() {
-    const product = await fetchProduct(productId);
+    const product = await dbGetProduct(productId);
     setProduct(product);
   }
 
@@ -158,8 +169,8 @@ export function CatalogProductCard(props: TProductCardProps) {
 }
 
 // получение продукта
-export async function fetchProduct(productId: number)  {
-  console.log('call fetchProduct, productId=' + productId); 
+export async function dbGetProduct(productId: number)  {
+  console.log('call dbGetProduct, productId=' + productId); 
   
   //искусственная задержка
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
@@ -171,8 +182,8 @@ export async function fetchProduct(productId: number)  {
 }
 
 // получение всех продуктов
-export async function fetchProductsAll()  {
-  console.log('call fetchProductsAll');
+export async function dbGetProductsAll()  {
+  console.log('call dbGetProductsAll');
   
   //искусственная задержка
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
@@ -180,6 +191,27 @@ export async function fetchProductsAll()  {
   const productsAll: TProduct[] = 
     JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
   return productsAll;
+}
+
+// добавление продукта на "сервере"
+export async function dbAddProduct(newProduct: TProduct)  {
+  console.log('call dbAddProduct'); 
+  
+  //искусственная задержка
+  await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
+
+  const productsAll: TProduct[] = 
+    JSON.parse(localStorage.getItem('products') ?? 'null') ?? [];
+
+  let insertId = 
+    (JSON.parse(localStorage.getItem('productsLastId') ?? 'null') ?? -1) + 1;
+
+  productsAll.push({...newProduct, id: insertId});
+
+  localStorage.setItem('products', JSON.stringify(productsAll));
+  localStorage.setItem('productsLastId', JSON.stringify(insertId));
+
+  return [true, insertId];
 }
 
 // редактирование продукта на "сервере"
@@ -259,16 +291,18 @@ export async function dbGetCategories() {
 /**********/
 
 // инициализация продуктов на "сервере"
-if( !localStorage.getItem('products') ) {
+if ( !(localStorage.getItem('products') && localStorage.getItem('productsLastId')) ) {
+  const lastId = initProducts.reduce((maxId, pr) => Math.max(maxId, pr.id), 0);
   localStorage.setItem('products', JSON.stringify(initProducts));
+  localStorage.setItem('productsLastId', JSON.stringify(lastId));
 }
 
 // инициализация производителей на "сервере"
-if( true || !localStorage.getItem('producers') ) {
+if ( true || !localStorage.getItem('producers') ) {
   localStorage.setItem('producers', JSON.stringify(initProducers));
 }
 
 // инициализация категорий на "сервере"
-if( true || !localStorage.getItem('categories') ) {
+if ( true || !localStorage.getItem('categories') ) {
   localStorage.setItem('categories', JSON.stringify(initCategories));
 }
