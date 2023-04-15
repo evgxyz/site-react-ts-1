@@ -1,6 +1,6 @@
 
 import React from 'react';
-import {isIntStr, range, compare} from './utils';
+import {isIntStr, pickobj} from './utils';
 import {useEnvControl} from './Env';
 import {
     TProduct, 
@@ -189,18 +189,20 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
   const [busy, setBusy] = React.useState(false);
 
   const [editing, setEditing] = React.useState(false);
-  const [newProduct, setNewProduct] = React.useState(() => ({...product}));
-  const [priceStr, setPriceStr] = React.useState(() => product.price.toString());
+  const [tmpProduct, setTmpProduct] = React.useState(() => 
+    ({...product, priceStr: product.price.toString()}));
 
   function toggleEditOnClick() {
     setEditing(st => !st);
-    setPriceStr(product.price.toString());
+    setTmpProduct({...product, priceStr: product.price.toString()})
   }
 
   function editProductOnSubmit(ev: React.SyntheticEvent) {
     ev.preventDefault(); 
     console.log('call editProductOnSubmit')
     setBusy(true);
+    const newProduct = 
+      pickobj(tmpProduct, Object.keys(product) as (keyof TProduct)[]);
     editProduct(product.id, newProduct)
       .then(() => {setEditing(false)})
       .finally(() => setBusy(false));
@@ -208,23 +210,22 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
 
   function titleOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
     const title = ev.currentTarget.value;
-    setNewProduct(pr => ({...pr, title}));
+    setTmpProduct(pr => ({...pr, title}));
   }
 
   function descriptionOnChange(ev: React.ChangeEvent<HTMLTextAreaElement>) {
     const description = ev.currentTarget.value;
-    setNewProduct(pr => ({...pr, description}));
+    setTmpProduct(pr => ({...pr, description}));
   }
 
   function priceOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
     const priceStr = ev.currentTarget.value.trim();
     if (priceStr == '' || isIntStr(priceStr)) {
-      setPriceStr(priceStr);
       let price = parseInt(priceStr);
       if (!isFinite(price)) { 
         price = 0;
       }
-      setNewProduct(pr => ({...pr, price}));
+      setTmpProduct(pr => ({...pr, price, priceStr}));
     } 
   }
 
@@ -250,13 +251,13 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
               <tr>
                 <td>Название:</td>
                 <td><input type='text' 
-                  value={newProduct.title} onChange={titleOnChange} /></td>
+                  value={tmpProduct.title} onChange={titleOnChange} /></td>
               </tr>
               <tr>
                 <td>Описание:</td>
                 <td>
                   <textarea 
-                    value={newProduct.description} 
+                    value={tmpProduct.description} 
                     onChange={descriptionOnChange}
                     className='adm-products-item__descr-ta' />
                 </td>
@@ -264,19 +265,19 @@ export function AdmProductsItem(props: TAdmProductsItemProps) {
               <tr>
                 <td>Цена:</td>
                 <td><input type='text' 
-                  value={priceStr} onChange={priceOnChange} /></td>
+                  value={tmpProduct.priceStr} onChange={priceOnChange} /></td>
               </tr>
               <tr>
                 <td>Производитель:</td>
-                <td><input type='text' value={product.producer} /></td>
+                <td><input type='text' value={tmpProduct.producer} /></td>
               </tr>
               <tr>
                 <td>Штрихкод:</td>
-                <td><input type='text' value={product.code} /></td>
+                <td><input type='text' value={tmpProduct.code} /></td>
               </tr>
               <tr>
                 <td>Категории:</td>
-                <td><div>{product.categories.join(', ')}</div></td>
+                <td><div>{tmpProduct.categories.join(', ')}</div></td>
               </tr>
             </tbody>
             </table>

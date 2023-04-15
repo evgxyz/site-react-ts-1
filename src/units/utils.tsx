@@ -16,11 +16,19 @@ export function compare<T>(x: T, y: T) {
   return (x < y) ? -1 : 1;
 }
 
-export function mergeObj<T extends object, T2 extends object>(obj: T, addObj: T2) {
-  return Object.assign({}, obj, addObj) as (T & T2);
+export function pickobj<T extends {}, K extends keyof T>(obj: T, keys: K[]) {
+  return Object.fromEntries(
+    keys
+    .filter(key => key in obj)
+    .map(key => [key, obj[key]])
+  )
 }
 
-export function addObj<T extends object, T2 extends object>(obj: T, addObj: T2) {
-  return Object.assign(obj, addObj) as (T & T2);
+export function mergeobj<T extends {}, T2 extends {}>(obj: T, obj2: T2) {
+  return Object.assign({}, obj, obj2) as (T & T2);
+}
+
+export function addobj<T extends {}, T2 extends {}>(obj: T, obj2: T2) {
+  return Object.assign(obj, obj2) as (T & T2);
 } 
 
