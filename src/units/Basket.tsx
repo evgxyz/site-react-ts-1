@@ -13,6 +13,7 @@ export interface TBasket {
 
 export enum BasketActionType { 
   INIT,
+  CLEAN,
   ADD, 
   SUB, 
   DEL,
@@ -104,6 +105,11 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
       return newBasket;
     }
 
+    case BasketActionType.CLEAN: {
+      localStorage.setItem('basket', JSON.stringify(defaultBasket));
+      return defaultBasket;
+    }
+
     default: 
       return basket;
   }
@@ -125,8 +131,9 @@ interface TBasketProps {
 
 export function Basket(props: TBasketProps) {
 
-  const [env, setEnv] = useEnvControl();
-  const [basket, ] = props.basketControl;
+  const [ , setEnv] = useEnvControl();
+  const [basket, basketDispatch] = props.basketControl;
+  const [busy, setBusy] = React.useState(false);
   
   React.useEffect(() => {
     setEnv(env => ({...env, 
@@ -134,6 +141,18 @@ export function Basket(props: TBasketProps) {
       navline: ['Корзина']
     }))
   }, []);
+
+  function makeOrderOnClick() {
+    if (confirm('Оформить заказ?')) {
+      setBusy(true); // блокируем кнопку
+      //искусственная задержка. будто отправляем заказ на сервер
+      setTimeout(() => {
+        basketDispatch({type: BasketActionType.CLEAN});
+        setBusy(false); 
+        setTimeout(() => alert('Заказ оформлен. Спасибо!'));
+      }, 1000);
+    }
+  }
   
   return (
     <div className='basket'>
@@ -153,6 +172,13 @@ export function Basket(props: TBasketProps) {
             ))
           }
         </div>
+        {
+          basket.totalCount > 0 ?
+            <div className='basket__menu'>
+              <button disabled={busy} onClick={makeOrderOnClick}>Оформить заказ</button>
+            </div> 
+          : null
+        }
       </div>
     </div>
   );

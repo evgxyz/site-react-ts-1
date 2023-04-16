@@ -375,33 +375,33 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
                 <td>
                   {
                     tmpCategories.length == 0 ?
-                    <span>Загрузка...</span>
+                      <span>Загрузка...</span>
                     :
-                    <>
-                    <div>
-                      {
-                        tmpCategories
-                          .filter(ct => ct.checked)
-                          .map(ct => ct.title).join(', ')
-                      }
-                    </div>
-                    <select multiple={true}
-                      value={
-                        tmpCategories
-                          .filter(ct => ct.checked)
-                          .map(ct => ct.id.toString())
-                      } 
-                      onChange={categoriesOnChange}
-                    >
-                      {
-                        tmpCategories.map(ct => 
-                          <option key={ct.id} value={ct.id.toString()}>
-                            {ct.title}
-                          </option>
-                        )
-                      }
-                    </select>
-                    </>
+                      <>
+                      <div className='product-form__categories-list'>
+                        {
+                          tmpCategories
+                            .filter(ct => ct.checked)
+                            .map(ct => ct.title).join(', ')
+                        }
+                      </div>
+                      <select multiple={true}
+                        value={
+                          tmpCategories
+                            .filter(ct => ct.checked)
+                            .map(ct => ct.id.toString())
+                        } 
+                        onChange={categoriesOnChange}
+                      >
+                        {
+                          tmpCategories.map(ct => 
+                            <option key={ct.id} value={ct.id.toString()}>
+                              {ct.title}
+                            </option>
+                          )
+                        }
+                      </select>
+                      </>
                   }
                 </td>
               </tr>
@@ -451,7 +451,7 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
               <tr>
                 <td>Категории:</td>
                 <td>
-                  <div>
+                  <div className='product-form__categories-list'>
                     { product.categories.sort().join(', ') }
                   </div>
                 </td>
@@ -558,6 +558,9 @@ function AddProductForm(props: TAddProductFormProps) {
 
   return (
     <>
+    <div className='product-form__title'>
+      Добавление продукта
+    </div>
     <form onSubmit={addProductOnSubmit}> 
       <table className='product-form__table'>
       <tbody>
@@ -610,7 +613,7 @@ function AddProductForm(props: TAddProductFormProps) {
                 <span>Загрузка...</span>
               :
                 <>
-                <div>
+                <div className='product-form__categories-list'>
                   {
                     tmpCategories
                       .filter(ct => ct.checked)

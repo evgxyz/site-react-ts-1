@@ -3,6 +3,10 @@
   font-family: Roboto, sans-serif;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #page-wrapper {
   display: table;
   margin: 0 auto;
@@ -22,7 +26,6 @@
   display: flex;
   border: 1px solid gray;
   padding: 10px;
-  background-color: bisque;
   justify-content: space-between;
 }
 
@@ -163,9 +166,9 @@
 
 .catalog-product-card {
   display: flex;
-  min-width: 15rem;
-  flex-basis: 18rem;
-  min-height: 13rem;
+  min-width: 16em;
+  flex-basis: 18em;
+  min-height: 16em;
   border: 1px solid gray;
   background-color: bisque;
   padding: 10px;
@@ -224,6 +227,10 @@
   justify-content: flex-start;
   row-gap: 10px;
   padding: 10px;
+}
+.basket__menu {
+  margin: 10px;
+  margin-top: 0;
 }
 
 .basket-item {
@@ -305,7 +312,11 @@
 .product-form {
   padding: 10px;
   border: 1px solid gray;
-  background-color: bisque;
+}
+.product-form__title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 .product-form__table {
   width: 100%;
@@ -317,16 +328,18 @@
   border: 1px solid gray;
 }
 .product-form__table td > div {
-  height: 1.2rem;
   padding: 4px;
 }
-.product-form__table td > input[type=text], .product-form__table td > textarea {
+.product-form__table td > input[type=text] {
   margin: 0;
-  height: 1.2rem;
+  width: 25em;
+  max-width: 100%;
   padding: 2px;
-  outline: none;
 }
 .product-form__table td > textarea {
+  margin: 0;
+  width: 25em;
+  max-width: 100%;
   padding: 3px;
 }
 .product-form__table td:first-child {
@@ -335,11 +348,11 @@
   text-align: right;
 }
 .product-form__descr-div {
-  min-height: 5em;
+  min-height: 3em;
 }
 .product-form__descr-ta {
   display: block;
-  min-height: 5em;
+  min-height: 3em;
 }
 .product-form__menu {
   margin-top: 10px;
