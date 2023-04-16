@@ -32,7 +32,9 @@ interface TAdmProductsAction {
 }
 
 type TAdmProductsCallbacks = {
-  [funcname: string]: (...arg: any[]) => Promise<any>
+  addProduct: (product: TProduct) => Promise<boolean>,
+  editProduct: (product: TProduct) => Promise<boolean>,
+  delProduct: (productId: number) => Promise<boolean>
 }
 
 const defaultAdmProducts: TAdmProducts = {
@@ -299,7 +301,7 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
     console.log('call editProductOnSubmit')
     setBusy(true);
     const newProduct = 
-      pickobj(tmpProduct, Object.keys(product) as (keyof TProduct)[]);
+      pickobj(tmpProduct, Object.keys(product) as (keyof TProduct)[]) as TProduct;
     const newCategories = tmpCategories.filter(ct => ct.checked).map(ct => ct.title);
     newProduct.categories = newCategories;
     editProduct(newProduct)
@@ -546,7 +548,7 @@ function AddProductForm(props: TAddProductFormProps) {
     console.log('call addProductOnSubmit')
     setBusy(true);
     const newProduct = 
-      pickobj(tmpProduct, Object.keys(templateProduct) as (keyof TProduct)[]);
+      pickobj(tmpProduct, Object.keys(templateProduct) as (keyof TProduct)[]) as TProduct;
     const newCategories = tmpCategories.filter(ct => ct.checked).map(ct => ct.title);
     newProduct.categories = newCategories;
     addProduct(newProduct)

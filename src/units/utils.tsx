@@ -16,12 +16,13 @@ export function compare<T>(x: T, y: T) {
   return (x < y) ? -1 : 1;
 }
 
-export function pickobj<T extends {}, K extends keyof T>(obj: T, keys: K[]) {
+export function pickobj
+<T extends {}, K extends keyof T, R extends {}>(obj: T, keys: K[]) {
   return Object.fromEntries(
     keys
     .filter(key => key in obj)
     .map(key => [key, obj[key]])
-  )
+  ) as R;
 }
 
 export function mergeobj<T extends {}, T2 extends {}>(obj: T, obj2: T2) {
