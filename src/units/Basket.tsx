@@ -228,10 +228,13 @@ export function BasketItemMenu(props: TBasketItemMenuProps) {
         {`${count} шт на ${count * product.price} ₽`}
       </div>
       <div className='basket-item-menu__btns'>
-        <button className='basket-item-menu__btn' onClick={basketAdd}>+</button>{' '}
         <button className='basket-item-menu__btn' 
-          disabled={count === 1} onClick={basketSub}>–</button>{' '}
-        <button className='basket-item-menu__btn' onClick={basketDel}>x</button>
+          onClick={basketAdd}>+</button>{' '}
+        <button className='basket-item-menu__btn' 
+          disabled={count === 1} 
+          onClick={basketSub}>–</button>{' '}
+        <button className='basket-item-menu__btn' 
+          onClick={basketDel}>x</button>
       </div>
     </div>
   )
@@ -268,11 +271,14 @@ export function ProductBasketMenu(props: TProductBasketMenuProps) {
       <div className='product-basket-menu__info'>
         В корзине {`${count} шт на ${count * product.price} ₽`}
       </div>
-      <button className='product-basket-menu__btn' onClick={basketAdd}>+</button>{' '}
       <button className='product-basket-menu__btn' 
-        disabled={count === 0} onClick={basketSub}>–</button>{' '}
+        onClick={basketAdd}>+</button>{' '}
       <button className='product-basket-menu__btn' 
-        disabled={count === 0} onClick={basketDel}>x</button>
+        disabled={count === 0} 
+        onClick={basketSub}>–</button>{' '}
+      <button className='product-basket-menu__btn' 
+        disabled={count === 0} 
+        onClick={basketDel}>x</button>
     </div>
   )
 }
@@ -295,16 +301,16 @@ export function BasketTray(props: TBasketTrayProps) {
   );
 }
 
+// получение корзины из хранилища
+async function dbGetBasket() {
+  console.log('call dbGetBasket');
+  return JSON.parse(localStorage.getItem('basket') ?? 'null') ?? defaultBasket;
+}
+
 // инициализация корзины
 export async function initBasket(basketControl: TBasketControl) {
   const [ , basketDispatch] = basketControl;
-  const basket = await fetchBasket();
+  const basket = await dbGetBasket();
   basketDispatch({type: BasketActionType.INIT, args: basket});
-}
-
-// получение корзины из хранилища
-export async function fetchBasket() {
-  console.log('call fetchBasket');
-  return (JSON.parse(localStorage.getItem('basket') ?? 'null')) ?? defaultBasket;
 }
 
