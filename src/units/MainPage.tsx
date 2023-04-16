@@ -19,7 +19,7 @@ export function MainPage() {
       <div className='main-page__content'>
         <div><a href="#!catalog">Каталог</a></div>
         <div><a href="#!basket">Корзина</a></div>
-        <div><a href="#!admin">Админка</a></div>
+        <div><a href="#!adminka">Админка</a></div>
       </div>
     </div>
   );

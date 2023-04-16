@@ -7,7 +7,7 @@ export function MainMenu() {
       <a href="#">Главная</a> {' | '}
       <a href="#!catalog">Каталог</a> {' | '} 
       <a href="#!basket">Корзина</a> {' | '} 
-      <a href="#!admin">Админка</a> 
+      <a href="#!adminka">Админка</a> 
     </div>
   );
 }

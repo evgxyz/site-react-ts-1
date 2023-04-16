@@ -32,7 +32,7 @@ export function App() {
       pageContent = <Basket basketControl={basketControl} />
     } 
     break;
-    case '#!admin': {
+    case '#!adminka': {
       pageContent = <Adminka />
     } 
     break;

@@ -4,7 +4,7 @@ import {isIntStr, pickobj, compare} from './utils';
 import {useEnvControl} from './Env';
 import {
     TProduct, TCategory, templateProduct,
-    dbGetProductsAll, 
+    dbGetProducts, 
     dbGetCategories,
     dbAddProduct,
     dbEditProduct, 
@@ -109,7 +109,7 @@ export function Adminka() {
     React.useReducer(admProductsReducer, defaultAdmProducts);
 
   async function updateAdmProducts() {
-    const products = await dbGetProductsAll();
+    const products = await dbGetProducts();
     admProductsDispatch({type: AdmProductsActionType.INIT, args: products})
   }
 

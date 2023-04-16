@@ -7,7 +7,7 @@ import {useEnvControl} from './Env';
 import {TBasketControl} from './Basket';
 import {
   TProduct, TProducer, TCategory, 
-  dbGetProductsAll, dbGetProducers, dbGetCategories,
+  dbGetProducts, dbGetProducers, dbGetCategories,
   CatalogProductCard
 } from './Products';
 
@@ -145,7 +145,7 @@ export function Catalog(props: TCatalogProps) {
     console.log('call initCatalog');
 
     // минимальная и максимальная цены
-    const productsAll = await dbGetProductsAll();
+    const productsAll = await dbGetProducts();
     const priceMin = productsAll
       .reduce((min, pr) => Math.min(min, pr.price), Infinity);
     const priceMax = productsAll

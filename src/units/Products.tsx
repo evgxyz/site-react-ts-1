@@ -182,8 +182,8 @@ export async function dbGetProduct(productId: number)  {
 }
 
 // получение всех продуктов
-export async function dbGetProductsAll()  {
-  console.log('call dbGetProductsAll');
+export async function dbGetProducts()  {
+  console.log('call dbGetProducts');
   
   //искусственная задержка
   await new Promise(resolve => {setTimeout(() => resolve(1), 700)});
