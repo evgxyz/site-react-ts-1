@@ -7,11 +7,13 @@ import {useEnvControl} from './Env';
 import {TBasketControl} from './Basket';
 import {
   TProduct, TProducer, TCategory, 
-  dbGetProducers, dbGetCategories,
+  dbGetProductsAll, dbGetProducers, dbGetCategories,
   CatalogProductCard
 } from './Products';
 
 interface TCatalogParams {
+  priceMin: number,
+  priceMax: number,
   priceFr: number,
   priceTo: number,
   producers: (TProducer & {checked: boolean})[],
@@ -43,13 +45,15 @@ const sortTypeTexts: {[sortType: string]: string} = {
   title_DESC: 'По названию ↓',
 };
 
-const defaultPriceFr = 0;
-const defaultPriceTo = 10000;
+const defaultPriceMin = 0;
+const defaultPriceMax = Infinity;
 const defaultSort = 'price';
 
 const defaultCatalogParams: TCatalogParams = {
-  priceFr: defaultPriceFr, 
-  priceTo: defaultPriceTo, 
+  priceMin: defaultPriceMin, 
+  priceMax: defaultPriceMax, 
+  priceFr: defaultPriceMin, 
+  priceTo: defaultPriceMax, 
   producers: [],
   categories: [],
   sort: defaultSort,
@@ -74,6 +78,9 @@ export function Catalog(props: TCatalogProps) {
   const [env, setEnv] = useEnvControl();
   const [router, setRouter] = useRouterControl();
 
+  const [catalogParams, setCatalogParams] = React.useState(defaultCatalogParams);
+  const [catalogResult, setCatalogResult] = React.useState(defaultCatalogResult);
+
   // номер страницы
   let page = parseInt(router.hashParams['page']);
   if (!isFinite(page)) {
@@ -83,12 +90,12 @@ export function Catalog(props: TCatalogProps) {
   // цена
   let priceFr = parseInt(router.hashParams['priceFr']);
   if (!isFinite(priceFr)) {
-    priceFr = defaultPriceFr;
+    priceFr = catalogParams.priceMin;
   }
 
   let priceTo = parseInt(router.hashParams['priceTo']);
   if (!isFinite(priceTo)) {
-    priceTo = defaultPriceTo;
+    priceTo = catalogParams.priceMax;
   }
 
   // производители
@@ -104,9 +111,6 @@ export function Catalog(props: TCatalogProps) {
   if (!sortTypes.includes(sort)) {
     sort = defaultSort;
   }
-
-  const [catalogParams, setCatalogParams] = React.useState(defaultCatalogParams);
-  const [catalogResult, setCatalogResult] = React.useState(defaultCatalogResult);
 
   // обновление результатов поиска
   const updateCatalogResult = React.useCallback(async function () {
@@ -140,6 +144,13 @@ export function Catalog(props: TCatalogProps) {
   async function initCatalogParams() {
     console.log('call initCatalog');
 
+    // минимальная и максимальная цены
+    const productsAll = await dbGetProductsAll();
+    const priceMin = productsAll
+      .reduce((min, pr) => Math.min(min, pr.price), Infinity);
+    const priceMax = productsAll
+      .reduce((max, pr) => Math.max(max, pr.price), 0)
+
     // производители
     const producersAll = await dbGetProducers();
     const producers = producersAll.map(pr => 
@@ -154,8 +165,10 @@ export function Catalog(props: TCatalogProps) {
 
     setCatalogParams(cp => { 
       return ({...cp, 
-        priceFr: priceFr,
-        priceTo: priceTo,
+        priceMin: priceMin,
+        priceMax: priceMax,
+        priceFr: Math.max(priceMin, priceFr),
+        priceTo: Math.min(priceMax, priceTo),
         producers: producers,
         categories: categories,
         sort: sort,
@@ -305,7 +318,7 @@ function FilterPrice(props: TFilterPriceProps) {
   React.useEffect(() => {
     setPriceFr(catalogParams.priceFr.toString());
     setPriceTo(catalogParams.priceTo.toString());
-  }, []);
+  }, [catalogParams.priceFr, catalogParams.priceTo]);
 
   // цена от
   function priceFrOnChange(ev: React.ChangeEvent<HTMLInputElement>) {
@@ -314,7 +327,7 @@ function FilterPrice(props: TFilterPriceProps) {
       setPriceFr(priceStr);
       let price = parseInt(priceStr);
       if (!isFinite(price)) {  
-        price = defaultPriceFr;
+        price = defaultPriceMin;
       }
       setCatalogParams(fp => ({...fp, priceFr: price}));
     }
@@ -327,7 +340,7 @@ function FilterPrice(props: TFilterPriceProps) {
       setPriceTo(priceStr);
       let price = parseInt(priceStr);
       if (!isFinite(price)) { 
-        price = defaultPriceTo;
+        price = defaultPriceMax;
       }
       setCatalogParams(fp => ({...fp, priceTo: price}));
     }
@@ -591,11 +604,11 @@ function catalogParamsHashQuery(catalogParams: TCatalogParams) {
   let query = new URLSearchParams();
   
   //цена
-  if (catalogParams.priceFr !== defaultPriceFr) {
+  if (catalogParams.priceFr !== defaultPriceMin) {
     query.append('priceFr', catalogParams.priceFr.toString());
   }
 
-  if (catalogParams.priceTo !== defaultPriceTo) {
+  if (catalogParams.priceTo !== defaultPriceMax) {
     query.append('priceTo', catalogParams.priceTo.toString());
   }
   
