@@ -109,7 +109,7 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
   }
 
   function getTotalPrice(products: TBasketProduct[]) {
-    return products.reduce((s, pr) => (s + pr.price*pr.count), 0);
+    return products.reduce((s, pr) => (s + pr.price * pr.count), 0);
   }
 }
 
