@@ -289,8 +289,8 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
         ev.currentTarget.selectedOptions, 
         opt => parseInt(opt.value)
       );
-      const newTmpCategories = tmpCategories.map(ct => 
-        ({...ct, checked: values.includes(ct.id)})
+      const newTmpCategories = tmpCategories.map(
+        ct => ({...ct, checked: values.includes(ct.id)})
       );
       setTmpCategories(newTmpCategories);
     }
@@ -410,7 +410,7 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
             <div className='product-form__menu'>
               <button className='product-form__btn' 
                 disabled={busy}
-                onClick={toggleEditOnClick}>Отменить</button>
+                onClick={toggleEditOnClick}>Отменить</button>{' '}
               <button type='submit' className='product-form__btn' 
                 disabled={busy}>Сохранить</button>
             </div>
@@ -460,11 +460,11 @@ function AdmProductsItem(props: TAdmProductsItemProps) {
             </table>
             <div className='product-form__menu'>
               <button className='product-form__btn' 
-                  disabled={busy}
-                  onClick={toggleEditOnClick}>Изменить</button>
+                disabled={busy}
+                onClick={toggleEditOnClick}>Изменить</button>{' '}
               <button className='product-form__btn' 
-                  disabled={busy}
-                  onClick={delProductOnClick}>Удалить</button>
+                disabled={busy}
+                onClick={delProductOnClick}>Удалить</button>
             </div>
           </>
       }
