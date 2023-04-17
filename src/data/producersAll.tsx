@@ -24,6 +24,10 @@ export const initProducersAll: TProducer[] = [
   },
   {
     "id": 6,
-    "title": "Дося"
+    "title": "Dosya"
+  },
+  {
+    "id": 7,
+    "title": "Alenka"
   }
 ];

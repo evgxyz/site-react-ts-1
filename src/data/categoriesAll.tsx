@@ -13,11 +13,6 @@ export const initCategoriesAll: TCategory[] = [
     "rate": 2
   },
   {
-    "id": 3,
-    "title": "Шампунь",
-    "rate": 3
-  },
-  {
     "id": 4,
     "title": "Уход за ногами",
     "rate": 4
@@ -29,7 +24,22 @@ export const initCategoriesAll: TCategory[] = [
   },
   {
     "id": 6,
-    "title": "Уход за спиной",
+    "title": "Уход за телом",
     "rate": 6
-  }
+  },
+  {
+    "id": 7,
+    "title": "Крем",
+    "rate": 7
+  },
+  {
+    "id": 8,
+    "title": "Шампунь",
+    "rate": 8
+  },
+  {
+    "id": 9,
+    "title": "Бальзам",
+    "rate": 9
+  },
 ];
