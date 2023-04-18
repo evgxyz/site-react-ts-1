@@ -12,11 +12,11 @@ export interface TBasket {
 }
 
 export enum BasketActionType { 
-  INIT,
-  CLEAN,
-  ADD, 
-  SUB, 
-  DEL,
+  INIT = 'INIT',
+  CLEAN = 'CLEAN',
+  ADD = 'ADD', 
+  SUB = 'SUB', 
+  DEL = 'DEL',
 }
 
 export interface TBasketAction {
@@ -36,7 +36,7 @@ const defaultBasket: TBasket = {
 }
 
 function basketReducer(basket: TBasket, action: TBasketAction) {
-  
+  console.log('call basketReducer, action.type=' + action.type);
   switch (action.type) {
 
     case BasketActionType.INIT: {
@@ -106,9 +106,20 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
     }
 
     case BasketActionType.CLEAN: {
+      const newBasket: TBasket = {
+        products: [],
+        totalCount: 0,
+        totalPrice: 0
+      }
+      localStorage.setItem('basket', JSON.stringify(newBasket));
+      return newBasket;
+    }
+
+    /* так не работает, массив products не обновляется в react-компонентах
+      case BasketActionType.CLEAN: {
       localStorage.setItem('basket', JSON.stringify(defaultBasket));
       return defaultBasket;
-    }
+    } */
 
     default: 
       return basket;
@@ -157,6 +168,7 @@ export function Basket(props: TBasketProps) {
   return (
     <div className='basket'>
       <h1 className='basket__title'>Корзина</h1>
+      {/* <pre>{JSON.stringify(basket)}</pre> */}
       <div className='basket__content'>
         <div className='basket__info'>
           Всего товаров {basket.totalCount} на {basket.totalPrice} ₽

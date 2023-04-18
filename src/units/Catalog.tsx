@@ -116,7 +116,7 @@ export function Catalog(props: TCatalogProps) {
   const updateCatalogResult = React.useCallback(async function () {
     
     if (catalogParams.updateResultFlag && catalogParams.initFlag) {
-      console.log('call updateCatalogResult:', JSON.stringify(catalogParams));    
+      console.log('call updateCatalogResult');    
 
       if (catalogParams.resetPageFlag) {
         const hashQuery = catalogParamsHashQuery(catalogParams);
