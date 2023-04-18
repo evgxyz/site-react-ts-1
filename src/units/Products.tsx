@@ -7,6 +7,7 @@ import {TBasketControl, ProductBasketMenu} from './Basket';
 import {initProductsAll} from '../data/productsAll';
 import {initProducersAll} from '../data/producersAll';
 import {initCategoriesAll} from '../data/categoriesAll';
+import {version} from '../settings';
 
 // продукт
 export interface TProduct {
@@ -288,10 +289,12 @@ export async function dbGetCategories() {
   return categories;
 }
 
-/**********/
+// новая ли версия?
+const newVersion = version !== localStorage.getItem('version');
 
 // инициализация продуктов на "сервере"
-if ( !( localStorage.getItem('productsAll') && 
+if ( newVersion || 
+     !( localStorage.getItem('productsAll') && 
         localStorage.getItem('productsAllLastId') ) ) {
   const lastId = initProductsAll.reduce((maxId, pr) => Math.max(maxId, pr.id), 0);
   localStorage.setItem('productsAll', JSON.stringify(initProductsAll));
@@ -299,11 +302,11 @@ if ( !( localStorage.getItem('productsAll') &&
 }
 
 // инициализация производителей на "сервере"
-if ( true || !localStorage.getItem('producersAll') ) {
+if ( newVersion || !localStorage.getItem('producersAll') ) {
   localStorage.setItem('producersAll', JSON.stringify(initProducersAll));
 }
 
 // инициализация категорий на "сервере"
-if ( true || !localStorage.getItem('categoriesAll') ) {
+if ( newVersion || !localStorage.getItem('categoriesAll') ) {
   localStorage.setItem('categoriesAll', JSON.stringify(initCategoriesAll));
 }

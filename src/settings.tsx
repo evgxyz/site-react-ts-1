@@ -1,2 +1,3 @@
 
-export const siteBaseURL = '/site-react-ts-1'
+// версия нужна для сброса старой конфигурации переменных в хранилище
+export const version = 'v230418-2';

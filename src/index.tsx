@@ -6,6 +6,7 @@ import {EnvProvider} from './units/Env';
 import {RouterProvider} from './units/Router';
 import {App} from './App';
 import './index.css';
+import './finally'; 
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
@@ -16,3 +17,4 @@ root.render(
   </RouterProvider>
   </EnvProvider>
 );
+
