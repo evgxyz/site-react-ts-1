@@ -384,16 +384,19 @@ button {
 
 input[type=text] {
   padding: 2px;
+  font-family: Roboto, sans-serif;
   font-size: 1em;
 }
 
 textarea {
   padding: 2px;
+  font-family: Roboto, sans-serif;
   font-size: 1em;
 }
 
 select {
   padding: 2px;
+  font-family: Roboto, sans-serif;
   font-size: 1em;
 }
 
