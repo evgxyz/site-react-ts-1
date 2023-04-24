@@ -19,10 +19,32 @@ export enum BasketActionType {
   DEL = 'DEL',
 }
 
-export interface TBasketAction {
-  type: BasketActionType,
-  args?: any
+interface TBasketActionINIT {
+  type: BasketActionType.INIT,
+  args: TBasket;
 }
+
+interface TBasketActionCLEAN {
+  type: BasketActionType.CLEAN,
+}
+
+interface TBasketActionADD {
+  type: BasketActionType.ADD,
+  args: TProduct
+}
+
+interface TBasketActionSUB {
+  type: BasketActionType.SUB,
+  args: TProduct
+}
+
+interface TBasketActionDEL {
+  type: BasketActionType.DEL,
+  args: TProduct
+}
+
+export type TBasketAction = TBasketActionINIT | TBasketActionCLEAN | 
+  TBasketActionADD | TBasketActionSUB | TBasketActionDEL;
 
 export type TBasketControl = [
   TBasket,
@@ -40,14 +62,14 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
   switch (action.type) {
 
     case BasketActionType.INIT: {
-      const newBasket = action.args as TBasket;
+      const newBasket = action.args;
       localStorage.setItem('basket', JSON.stringify(newBasket));
       return newBasket;
     }
     
     case BasketActionType.ADD: {
       let newBasket: TBasket;
-      const product = action.args as TProduct;
+      const product = action.args;
       const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
         basket.products[index].count++;
@@ -68,7 +90,7 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
 
     case BasketActionType.SUB: {
       let newBasket: TBasket;
-      const product = action.args as TProduct;
+      const product = action.args;
       const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
         basket.products[index].count--;
@@ -89,7 +111,7 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
 
     case BasketActionType.DEL: {
       let newBasket: TBasket;
-      const product = action.args as TProduct;
+      const product = action.args;
       const index = basket.products.findIndex(pr => pr.id === product.id);
       if (index >= 0) {
         basket.products.splice(index, 1);
@@ -114,12 +136,6 @@ function basketReducer(basket: TBasket, action: TBasketAction) {
       localStorage.setItem('basket', JSON.stringify(newBasket));
       return newBasket;
     }
-
-    /* так не работает, массив products не обновляется в react-компонентах
-      case BasketActionType.CLEAN: {
-      localStorage.setItem('basket', JSON.stringify(defaultBasket));
-      return defaultBasket;
-    } */
 
     default: 
       return basket;

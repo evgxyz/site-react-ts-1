@@ -26,10 +26,28 @@ enum AdmProductsActionType {
   DEL = 'DEL',
 }
 
-interface TAdmProductsAction {
-  type: AdmProductsActionType,
-  args?: any
+interface TAdmProductsActionINIT {
+  type: AdmProductsActionType.INIT,
+  args: TProduct[]
 }
+
+interface TAdmProductsActionADD {
+  type: AdmProductsActionType.ADD,
+  args: TProduct
+}
+
+interface TAdmProductsActionEDIT {
+  type: AdmProductsActionType.EDIT,
+  args: TProduct
+}
+
+interface TAdmProductsActionDEL {
+  type: AdmProductsActionType.DEL,
+  args: number
+}
+
+type TAdmProductsAction = TAdmProductsActionINIT | TAdmProductsActionADD |
+  TAdmProductsActionEDIT | TAdmProductsActionDEL;
 
 type TAdmProductsCallbacks = {
   addProduct: (product: TProduct) => Promise<boolean>,
@@ -55,7 +73,7 @@ function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsActio
   switch (action.type) {
 
     case AdmProductsActionType.INIT: {
-      const products = action.args as TProduct[];
+      const products = action.args;
       return {...admProducts, 
         products: products,
         initFlag: true
@@ -63,13 +81,13 @@ function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsActio
     }
 
     case AdmProductsActionType.ADD: {
-      const newProduct = action.args as TProduct;
+      const newProduct = action.args;
       admProducts.products.push(newProduct);
       return {...admProducts};
     }
 
     case AdmProductsActionType.EDIT: {
-      const newProduct = action.args as TProduct;
+      const newProduct = action.args;
       const products = admProducts.products;
       const index = products.findIndex(pr => pr.id === newProduct.id);
       if (index >= 0) {
@@ -84,7 +102,7 @@ function admProductsReducer(admProducts: TAdmProducts, action: TAdmProductsActio
     }
 
     case AdmProductsActionType.DEL: {
-      const productId = action.args as number;
+      const productId = action.args;
       const products = admProducts.products;
       const index = admProducts.products.findIndex(pr => pr.id === productId);
       if (index >= 0) {
